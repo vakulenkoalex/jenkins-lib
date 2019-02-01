@@ -1,8 +1,5 @@
 
-// todo проверка тестов и расширений
 // todo для освобождения ноды при CodeAnalysis можно попробовать использовать ещё одну сборку с передачей параметров ей и забиранием результата
-// todo расчет цикломатической сложности с выводом большой сложности и с исключениями
-// todo вынести отладку в параметр сборки, чтобы не менять файл для вывода отладочной информации
 
 //методы для jenkins
 
@@ -38,7 +35,6 @@ def setRunModeOrdinaryApplication(){
     MainBuild.s_runModeOrdinaryApplication = true
 }
 
-//todo найти способ проверки существования папки fixtures и удалить флаг
 def setFixturesNotExists(){
     //noinspection GroovyAssignabilityCheck
     MainBuild.s_fixturesExists = false
@@ -1320,11 +1316,6 @@ enum BehaveTestType {
 
 class BehaveTest extends TestCase{
 
-    //todo проблемы с allure
-    // сценарий упал, потом сценарий удалили, а в истории висит как не работающий
-    // не собирает результаты из веток, только последний
-    // нет изменения состояние при падающем тесте
-
     private final BehaveTestType m_type
     private final String m_extensions
     private final String m_features
@@ -1508,7 +1499,6 @@ class BehaveTest extends TestCase{
 
         if (m_type==BehaveTestType.WEB){
 
-            //todo сделать закрытия браузера по умолчанию
             //todo найти ключ для запуска браузера без ошибок после принудительного завершения (пока просто очищаю кэш)
             MainBuild.startBat('taskkill /IM chrome.exe /F || exit 0')
             MainBuild.startBat('rd /Q /S "%userprofile%\\AppData\\Local\\Google\\Chrome\\User Data\\Default"')
