@@ -233,10 +233,7 @@ final class MainBuild{
     }
 
     static void writeTextToFile(final String pathToFile, final String text){
-
-        s_script.writeFile(file: pathToFile, text: text)
-        setUtfEncoding(pathToFile)
-
+        s_script.writeFile(encoding: 'UTF-8', file: pathToFile, text: text)
     }
 
     static Boolean getRunModeOrdinaryApplication(){
@@ -537,22 +534,6 @@ final class MainBuild{
 
     private static String getArtifactsPath() {
         return s_artifactsPath + ', ' + baseFolder() + '/1Cv8.1CD'
-    }
-
-    private static void setUtfEncoding(String pathToFile) {
-        if (!s_script.fileExists('ChangeEncoding.py')) {
-            s_script.step(
-                    [
-                            $class              : 'CopyArtifact',
-                            filter              : 'script/ChangeEncoding.py',
-                            fingerprintArtifacts: true,
-                            flatten             : true,
-                            projectName         : 'Tools'
-                    ]
-            )
-        }
-
-        startBat('python ChangeEncoding.py --file ' + pathToFile)
     }
 
     private static void saveChangeFiles() {
