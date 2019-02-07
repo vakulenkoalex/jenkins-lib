@@ -5,7 +5,6 @@
 
 def setScript(final script){
     MainBuild.s_script = script
-    //noinspection GroovyAssignabilityCheck
     MainBuild.s_libScript = this
 }
 
@@ -18,7 +17,6 @@ def startBuild(){
 }
 
 def setNode(final String node){
-    //noinspection GroovyAssignabilityCheck
     MainBuild.s_node = node
 }
 
@@ -26,17 +24,14 @@ def setPathToSource(final repo, final branch, final bitbucket = false){
     MainBuild.s_repo = repo
     MainBuild.s_branch = branch
     MainBuild.s_bitbucket = bitbucket
-    //noinspection GroovyAssignabilityCheck
     MainBuild.s_multibranch = false
 }
 
 def setRunModeOrdinaryApplication(){
-    //noinspection GroovyAssignabilityCheck
     MainBuild.s_runModeOrdinaryApplication = true
 }
 
 def setFixturesNotExists(){
-    //noinspection GroovyAssignabilityCheck
     MainBuild.s_fixturesExists = false
 }
 
@@ -47,17 +42,14 @@ def setPath1C(final path1C){
 def setDebugMode(){
     MainBuild.s_debug = true
     MainBuild.s_sendMsg = false
-    //noinspection GroovyAssignabilityCheck
     disableScanTask()
 }
 
 def disableScanTask(){
-    //noinspection GroovyAssignabilityCheck
     MainBuild.s_scanTask = false
 }
 
 def setArtifactsPath(final String path){
-    //noinspection GroovyAssignabilityCheck
     MainBuild.s_artifactsPath = path
 }
 
@@ -100,7 +92,6 @@ final class MainBuild{
 
         s_script.node(s_node) {
 
-            //noinspection GroovyVariableCanBeFinal
             try {
 
                 s_script.timestamps {
@@ -123,7 +114,6 @@ final class MainBuild{
                 }
 
             } catch (exception) {
-                //noinspection GroovyAssignabilityCheck
                 setResultAfterError(exception)
             } finally {
                 if (!s_debug) {
@@ -157,16 +147,13 @@ final class MainBuild{
 
         if (!resourceExist(name)){
 
-            //noinspection GroovyAssignabilityCheck
             debug('stash: ' + name, 32)
-            //noinspection GroovyAssignabilityCheck
             debug('path: ' + path, 32)
 
             s_script.stash(includes: path, name: name)
             s_existResources.add(name)
 
         }else{
-            //noinspection GroovyAssignabilityCheck
             debug('exist stash: ' + name, 32)
         }
 
@@ -174,7 +161,6 @@ final class MainBuild{
 
     static void unstashResource(final String name){
 
-        //noinspection GroovyAssignabilityCheck
         debug('unstash: ' + name, 32)
         s_script.unstash(name)
 
@@ -200,7 +186,6 @@ final class MainBuild{
 
     static void startBat(final String text){
 
-        //noinspection GroovyAssignabilityCheck
         debug('startBat: ' + text)
         s_script.bat(text)
 
@@ -208,7 +193,6 @@ final class MainBuild{
 
     static void startBatСyrillic(final String text){
 
-        //noinspection GroovyAssignabilityCheck
         debug('startBatСyrillic: ' + text)
         s_script.bat('''chcp 65001 >NUL
                         set x=''' + text + '''
@@ -241,7 +225,6 @@ final class MainBuild{
         }
 
         s_script.timeout(90) {
-            //noinspection GroovyAssignabilityCheck
             startBat(partOfText.join(' '))
         }
 
@@ -280,7 +263,6 @@ final class MainBuild{
 
     static void deleteWorkspace(){
 
-        //noinspection UnnecessaryQualifiedReference
         s_script.sleep(10)
         s_script.cleanWs(
                 cleanWhenAborted: false,
@@ -306,9 +288,7 @@ final class MainBuild{
 
         final String pathToResult = 'Result'
 
-        //noinspection GroovyAssignabilityCheck
         startBat('mkdir ' + pathToResult)
-        //noinspection GroovyAssignabilityCheck
         startBat(String.format('copy %1$s %2$s', pathToFile, pathToResult))
 
         s_script.publishHTML(
@@ -328,12 +308,9 @@ final class MainBuild{
 
     static void setResultAllure(final String testName, final String pathToFolder){
 
-        //noinspection GrUnnecessaryDefModifier
         final def files = s_script.findFiles(glob: pathToFolder + '//*.xml')
         for(int count = 0; count < files.size(); count++) {
-            //noinspection GroovyAssignabilityCheck
             if (findErrorInFile(testName, files[count].path, true)){
-                //noinspection GroovyBreak
                 break
             }
         }
@@ -354,16 +331,13 @@ final class MainBuild{
             s_script.currentBuild.result = 'UNSTABLE'
         }
 
-        //noinspection GroovyAssignabilityCheck
         //s_script.currentBuild.description = addTextToString(s_script.currentBuild.description, testName)
 
     }
 
     private static void sortTestsByNode(){
 
-        //noinspection GroovyVariableCanBeFinal
         ArrayList newTests = new ArrayList()
-        //noinspection GroovyVariableCanBeFinal,GroovyAssignabilityCheck
         for(TestCase object: s_tests) {
             if (object.getNode()!=''){
                 newTests.add(object)
@@ -418,9 +392,7 @@ final class MainBuild{
         String filePath = Folders.SYNTAX.m_path + '\\' + fileName
         String copyCommand = 'copy %1$s %2$s'
         if (s_script.fileExists(filePath)){
-            //noinspection GroovyAssignabilityCheck
             startBat(String.format(copyCommand, filePath, Folders.SYNTAX_ACC.m_path + '\\' + fileName))
-            //noinspection GroovyAssignabilityCheck
             startBat(String.format(copyCommand, filePath, Folders.SYNTAX_PLATFORM.m_path + '\\' + fileName))
         }
 
@@ -460,7 +432,6 @@ final class MainBuild{
                 partOfText.add(String.format('--fixtures "%1$s\\%2$s"', workPath, Folders.FIXTURES.m_path))
             }
 
-            //noinspection GroovyAssignabilityCheck
             run1C(partOfText.join(' '), baseFolder())
 
             String filePath = baseFolder() + '/1Cv8.1CD'
@@ -470,7 +441,6 @@ final class MainBuild{
                 filePath += ', ' + fileChangeObject()
             }
 
-            //noinspection GroovyAssignabilityCheck
             stashResource(baseFolder(), filePath)
             stashResource(taskFor1C(), 'TaskFor1C.py, commands\\*')
 
@@ -499,7 +469,6 @@ final class MainBuild{
 
         s_script.stage('GetResources'){
 
-            //noinspection GroovyAssignabilityCheck
             for(final TestCase object: s_tests) {
                 object.getResources()
             }
@@ -545,7 +514,6 @@ final class MainBuild{
                     s_script.slackSend color: color, failOnError: true, message: message.join(' ')
                 }
             }catch (exception){
-                //noinspection GroovyAssignabilityCheck
                 showError(exception)
             }
 
@@ -586,36 +554,27 @@ final class MainBuild{
             )
         }
 
-        //noinspection GroovyAssignabilityCheck
         startBat('python ChangeEncoding.py --file ' + pathToFile)
     }
 
     private static void saveChangeFiles() {
         ArrayList changeFiles = s_libScript.getChangeFiles()
         if (changeFiles.size() > 0) {
-            //noinspection GroovyAssignabilityCheck
             writeTextToFile(s_fileСhangeObject, changeFiles.join(System.lineSeparator()))
         }
     }
 
     private static void getTestFromName() {
 
-        //noinspection GroovyAssignabilityCheck
         for(object in s_testName) {
-            //noinspection GroovyIfStatementWithTooManyBranches
             if (object.name == 'UnitTest') {
-                //noinspection GroovyAssignabilityCheck
                 s_tests.add(new UnitTest(object.name, object.node))
             }else if (object.name == 'PlatformCheck') {
-                //noinspection GroovyAssignabilityCheck
                 s_tests.add(new PlatformCheck(object.name + 'Extended', object.node, true))
-                //noinspection GroovyAssignabilityCheck
                 s_tests.add(new PlatformCheck(object.name + 'Simple', '', false))
             }else if (object.name == 'CodeAnalysis') {
-                //noinspection GroovyAssignabilityCheck
                 s_tests.add(new CodeAnalysis(object.name + 'Split', object.node, true))
             }else if (object.name == 'CodeAnalysisFull') {
-                //noinspection GroovyAssignabilityCheck
                 s_tests.add(new CodeAnalysis(object.name, object.node, false))
             }else if (object.name == 'BehaveTest') {
 
@@ -668,7 +627,6 @@ final class MainBuild{
                     tag = tag.replace('Расширение', '')
                     String name = 'BehaveTest' + type.m_name + tag.replace(',', '')
 
-                    //noinspection GroovyAssignabilityCheck
                     debug('BehaveTest name = ' + name)
                     debug('BehaveTest type = ' + type.m_name)
                     debug('BehaveTest features = ' + file)
@@ -742,10 +700,8 @@ final class MainBuild{
     private static String addTextToString(String string, final String text){
 
         if ((string!='')&&(string!=null)){
-            //noinspection GroovyAssignmentToMethodParameter
             string += ', ' + text
         }else{
-            //noinspection GroovyAssignmentToMethodParameter
             string = text
         }
 
@@ -781,12 +737,9 @@ enum Folders{
 //не переносить в класс иначе не работает parallel
 def runTests(final tests){
 
-    //noinspection GroovyVariableCanBeFinal,GroovyAssignabilityCheck
     def stepsForParallel = [:]
 
-    //noinspection GroovyVariableCanBeFinal,GroovyAssignabilityCheck
     for(TestCase object: tests) {
-        //noinspection GroovyAssignabilityCheck
         stepsForParallel[object.getName()] = object.runTest()
     }
 
@@ -801,20 +754,15 @@ def getChangeFiles(){
     ArrayList changeFiles = new ArrayList()
     def changeLogSets = currentBuild.changeSets
 
-    //noinspection GroovyVariableNotAssigned
     for (int i = 0; i < changeLogSets.size(); i++) {
 
-        //noinspection GroovyAssignabilityCheck
         def entries = changeLogSets[i].items
 
-        //noinspection GroovyVariableNotAssigned
         for (int j = 0; j < entries.length; j++) {
 
-            //noinspection GroovyAssignabilityCheck
             def files = entries[j].affectedFiles
 
             for (int k = 0; k < files.size(); k++) {
-                //noinspection GroovyVariableNotAssigned,GroovyAssignabilityCheck
                 changeFiles.add(files[k].path)
             }
 
@@ -822,7 +770,6 @@ def getChangeFiles(){
 
     }
 
-    //noinspection GroovyAssignabilityCheck,GroovyVariableNotAssigned
     return changeFiles
 
 }
@@ -841,7 +788,6 @@ abstract class TestCase implements Serializable{
     }
 
     def runTest(){
-        //noinspection GroovyAssignabilityCheck
         return {
 
             s_script.node(m_node) {
@@ -850,7 +796,6 @@ abstract class TestCase implements Serializable{
 
                     Boolean errorExist = false
 
-                    //noinspection GroovyVariableCanBeFinal
                     try {
 
                         s_script.deleteDir()
@@ -859,7 +804,6 @@ abstract class TestCase implements Serializable{
 
                     }catch (exception) {
                         errorExist = true
-                        //noinspection GroovyAssignabilityCheck
                         MainBuild.setResultAfterError(exception)
                     } finally {
 
@@ -870,7 +814,6 @@ abstract class TestCase implements Serializable{
                                 MainBuild.deleteWorkspace()
                             }catch (exception) {
                                 errorExist = true
-                                //noinspection GroovyAssignabilityCheck
                                 MainBuild.setResultAfterError(exception)
                             }
                         }
@@ -910,17 +853,14 @@ abstract class TestCase implements Serializable{
     }
 
     void getResources(){
-        //noinspection GroovyAssignabilityCheck
         MainBuild.debug(m_name + '_getResources')
     }
 
     protected void commandForRunTest(){
-        //noinspection GroovyAssignabilityCheck
         MainBuild.debug(m_name + '_commandForRunTest')
     }
 
     protected void commandAfterTest(){
-        //noinspection GroovyAssignabilityCheck
         MainBuild.debug(m_name + '_commandAfterTest')
     }
 
@@ -944,7 +884,6 @@ class PlatformCheck extends TestCase{
     }
 
     void getResources(){
-        //noinspection GroovyAssignabilityCheck
         MainBuild.stashResource(getClassName(), m_pathToConfig + '/*')
     }
 
@@ -983,7 +922,6 @@ class PlatformCheck extends TestCase{
         }
 
         partOfText.add(String.format('--skip_error %1$s\\IgnoreError.txt --skip_object %1$s\\IgnoreObject.txt', m_pathToConfig))
-        //noinspection GroovyAssignabilityCheck
         MainBuild.run1C(partOfText.join(' '), MainBuild.baseFolder(), resultName, false)
 
         if (MainBuild.getTextFromFile(resultName) != '') {
@@ -1025,7 +963,6 @@ class CodeAnalysis extends TestCase{
     private final Boolean m_split
 
     CodeAnalysis(final String name, final String node, final Boolean split){
-        //noinspection GroovyAssignabilityCheck
         super(name, node)
         m_split = split
      }
@@ -1046,7 +983,6 @@ class CodeAnalysis extends TestCase{
                         ]
                 )
             }else{
-                //noinspection GroovyAssignabilityCheck
                 MainBuild.startBat(String.format('echo f|xcopy /y "%1$s\\1Cv8.1CD" "%2$s\\1Cv8.1CD" >nul', MainBuild.baseFolder(), s_baseAcc))
             }
 
@@ -1066,7 +1002,6 @@ class CodeAnalysis extends TestCase{
             }
 
             final String resource = String.format('%1$s/*, %2$s/1Cv8.1CD, SyntaxCheckAcc.epf, Part*.txt, CreateBase.txt', s_pathToConfig, s_baseAcc)
-            //noinspection GroovyAssignabilityCheck
             MainBuild.stashResource(s_stashName, resource)
 
         }
@@ -1110,7 +1045,6 @@ class CodeAnalysis extends TestCase{
             parameterEpf.add(String.format('IgnoreRequirements=%1$s\\IgnoreRequirements.txt', s_pathToConfig))
         }
 
-        //noinspection GroovyAssignabilityCheck
         MainBuild.run1C(String.format('start %1$s "%2$s"', s_command, parameterEpf.join(';')), s_baseAcc, logFileName, true)
         MainBuild.publishResultHTML(logName, logFileName)
 
@@ -1120,7 +1054,6 @@ class CodeAnalysis extends TestCase{
 
             if (m_split) {
 
-                //noinspection GroovyAssignabilityCheck
                 MainBuild.stashResource(s_baseAcc, s_baseAcc + '/*')
 
                 ArrayList PartOfAnalysis = getPartOfAnalysis()
@@ -1171,10 +1104,8 @@ class CodeAnalysis extends TestCase{
 
         ArrayList tests = new ArrayList()
 
-        //noinspection GroovyAssignabilityCheck
         CodeAnalysisType[] valueEnum = CodeAnalysisType.values()
         for (int i = 0; i < valueEnum.size(); i++) {
-            //noinspection GroovyAssignabilityCheck
             CodeAnalysisType element = valueEnum[i]
             tests.add(new CodeAnalysisSplit(element.m_node, element))
         }
@@ -1190,7 +1121,6 @@ class CodeAnalysisSplit extends TestCase{
     private final CodeAnalysisType m_type
 
     CodeAnalysisSplit(final String node, final CodeAnalysisType type){
-        //noinspection GroovyAssignabilityCheck
         super('CodeAnalysis' + type.m_name, node)
         m_type = type
     }
@@ -1221,13 +1151,11 @@ class CodeAnalysisSplit extends TestCase{
             ArrayList requirements = getRequirementsFromPartFile(pathToFile)
 
             String fileName = 'requirements.txt'
-            //noinspection GroovyAssignabilityCheck
             MainBuild.writeTextToFile(fileName, requirements.join(System.lineSeparator()))
             parameterEpf.add('IgnoreRequirements=' + fileName)
 
         }
 
-        //noinspection GroovyAssignabilityCheck
         MainBuild.run1C(String.format('start %1$s "%2$s"', CodeAnalysis.s_command, parameterEpf.join(';')), CodeAnalysis.s_baseAcc, logFileName, true)
         MainBuild.publishResultHTML(logName, logFileName)
 
@@ -1238,7 +1166,6 @@ class CodeAnalysisSplit extends TestCase{
     private ArrayList getRequirementsFromPartFile(String pathToFile) {
 
         ArrayList requirements = MainBuild.getTextFromFile(pathToFile).split(System.lineSeparator())
-        //noinspection GroovyAssignabilityCheck
         CodeAnalysisType[] valueEnum = CodeAnalysisType.values()
         for (int i = 0; i < valueEnum.size(); i++) {
             CodeAnalysisType element = valueEnum[i]
@@ -1265,7 +1192,6 @@ class UnitTest extends TestCase{
     }
 
     void getResources(){
-        //noinspection GroovyAssignabilityCheck
         MainBuild.stashResource(getName(), m_pathToTest + '/*')
     }
 
@@ -1291,9 +1217,7 @@ class UnitTest extends TestCase{
                                     MainBuild.baseFolder(), s_script.pwd(), m_pathToTest, resultName)
 
         String fileName = 'xUnit.json'
-        //noinspection GroovyAssignabilityCheck
         MainBuild.writeTextToFile(fileName, textFile.replace('\\', '\\\\'))
-        //noinspection GroovyAssignabilityCheck
         MainBuild.run1C('file --params ' + fileName)
 
         s_script.junit(resultName)
@@ -1364,7 +1288,6 @@ class BehaveTest extends TestCase{
                     ]
             )
 
-            //noinspection GroovyAssignabilityCheck
             MainBuild.stashResource(getClassName(), 'vanessa-behavior.epf, lib/FeatureReader/vbFeatureReader.epf,' +
                     ' features/Libraries/**, locales/**, plugins/**, vendor/**')
 
@@ -1440,7 +1363,6 @@ class BehaveTest extends TestCase{
                                             "СписокТеговИсключение": "Draft"
                                         }
                                     """
-        //noinspection GroovyAssignabilityCheck
         MainBuild.writeTextToFile(fileNameConfig, configVanessa)
 
         ArrayList partOfText = new ArrayList()
@@ -1453,9 +1375,7 @@ class BehaveTest extends TestCase{
             MainBuild.run1C('reg_server')
         }else if (m_type==BehaveTestType.WEB){
 
-            //noinspection GroovyAssignabilityCheck
             MainBuild.startBat(String.format('copy %1$s %2$s || exit 0', m_pathToConf, workPath))
-            //noinspection GroovyAssignabilityCheck
             MainBuild.startBat(String.format('MKLINK /D %1$s %2$s\\%3$s || exit 0', m_linkToBase, workPath, MainBuild.baseFolder()))
 
             ArrayList partOfWebinst = new ArrayList()
@@ -1469,19 +1389,14 @@ class BehaveTest extends TestCase{
             partOfApache.add(String.format('-confpath %1$s"', m_pathToConf.replace('\\', '\\\\')))
             partOfWebinst.add(partOfApache.join(' ') + ']')
             String fileNamePublish = 'webinst.json'
-            //noinspection GroovyAssignabilityCheck
             MainBuild.writeTextToFile(fileNamePublish, partOfWebinst.join(', '))
-            //noinspection GroovyAssignabilityCheck
             MainBuild.run1C('file --params ' + fileNamePublish)
 
-            //noinspection GroovyAssignabilityCheck
             changeAlias(m_pathToConf, m_baseName)
-            //noinspection GroovyAssignabilityCheck
             MainBuild.startBat('start ' + m_commandStartApache)
 
         }
 
-        //noinspection GroovyAssignabilityCheck
         MainBuild.run1C(partOfText.join(' '), MainBuild.baseFolder())
 
         final String fileName = 'CucumberJson.json'
@@ -1503,14 +1418,10 @@ class BehaveTest extends TestCase{
             MainBuild.startBat('taskkill /IM chrome.exe /F || exit 0')
             MainBuild.startBat('rd /Q /S "%userprofile%\\AppData\\Local\\Google\\Chrome\\User Data\\Default"')
 
-            //noinspection GroovyAssignabilityCheck
             MainBuild.startBat('taskkill /IM ' + m_pathToApache + ' /F || exit 0')
 
-            //noinspection GroovyAssignabilityCheck
             MainBuild.startBat('rmdir ' + m_linkToBase)
-            //noinspection GroovyAssignabilityCheck
             MainBuild.startBat(String.format('copy %1$s\\%2$s %3$s /y || exit 0', s_script.pwd(), m_confName, m_confDir))
-            //noinspection GroovyAssignabilityCheck
             MainBuild.startBat('rmdir ' + m_webDir + ' /S /Q')
 
         }
@@ -1521,7 +1432,6 @@ class BehaveTest extends TestCase{
     private void changeAlias(final String pathToConf, final String oldAlias){
 
         final String text = MainBuild.getTextFromFile(pathToConf)
-        //noinspection GroovyAssignabilityCheck
         MainBuild.writeTextToFile(pathToConf, text.replaceAll(oldAlias, ''))
 
     }
