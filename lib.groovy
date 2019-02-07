@@ -326,7 +326,7 @@ final class MainBuild{
             s_script.currentBuild.result = 'UNSTABLE'
         }
 
-        //s_script.currentBuild.description = addTextToString(s_script.currentBuild.description, testName)
+        s_script.currentBuild.description = addTextToString(s_script.currentBuild.description, testName)
 
     }
 
