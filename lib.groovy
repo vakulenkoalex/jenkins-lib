@@ -716,7 +716,7 @@ def runTests(final tests){
         stepsForParallel[object.getName()] = object.runTest()
     }
 
-    stepsForParallel.failFast = true
+    stepsForParallel.failFast = (!MainBuild.s_debug)
     parallel(stepsForParallel)
 
 }
