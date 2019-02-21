@@ -65,7 +65,6 @@ final class MainBuild{
     public static Boolean s_runModeOrdinaryApplication = false
     public static Boolean s_scanTask = true
     private static String s_baseFolder = 'base'
-    private static String s_stashNameTaskFor1C = 'TaskFor1C'
     private static String s_fileСhangeObject = 'Object.txt'
     private static ArrayList s_tests = new ArrayList()
     private static ArrayList s_testName = new ArrayList()
@@ -195,28 +194,34 @@ final class MainBuild{
     }
 
     static void run1C(final String command, final String base = '', final String log = '', final boolean notUsePath=false){
+        
+        if (s_debug) {
+            startBat('runner1c version')
+        }
 
         ArrayList partOfText = new ArrayList()
-        partOfText.add('python TaskFor1C.py --timeout 0')
+        partOfText.add('runner1c')
+        
+        if (s_debug) {
+            partOfText.add('--debug')
+        }
+        
+        partOfText.add(command)
 
         if (!notUsePath && s_path1C != ''){
             partOfText.add(String.format('--path "%1$s"', s_path1C))
         }
 
-        if (s_debug) {
-            partOfText.add('--debug')
-        }
+        
 
         if (log != ''){
             partOfText.add(String.format('--log "%1$s"', log))
         }
 
-        partOfText.add(command)
-
         if (base != ""){
             partOfText.add(String.format('--connection "File=%1$s"', base))
         }
-
+        
         s_script.timeout(90) {
             startBat(partOfText.join(' '))
         }
@@ -241,10 +246,6 @@ final class MainBuild{
 
     static String baseFolder(){
         return s_baseFolder
-    }
-
-    static String taskFor1C(){
-        return s_stashNameTaskFor1C
     }
 
     static String fileChangeObject(){
@@ -382,11 +383,11 @@ final class MainBuild{
     private static void copyIgnoreObject(){
 
         String fileName = 'IgnoreObject.txt'
-        String filePath = Folders.SYNTAX.m_path + '\\' + fileName
+        String filePath = 'spec\\syntax' + '\\' + fileName
         String copyCommand = 'copy %1$s %2$s'
         if (s_script.fileExists(filePath)){
-            startBat(String.format(copyCommand, filePath, Folders.SYNTAX_ACC.m_path + '\\' + fileName))
-            startBat(String.format(copyCommand, filePath, Folders.SYNTAX_PLATFORM.m_path + '\\' + fileName))
+            startBat(String.format(copyCommand, filePath, 'spec\\syntax\\acc' + '\\' + fileName))
+            startBat(String.format(copyCommand, filePath, 'spec\\syntax\\platform' + '\\' + fileName))
         }
 
     }
@@ -395,29 +396,9 @@ final class MainBuild{
 
         s_script.stage('CreateBase'){
 
-            s_script.step(
-                    [
-                            $class: 'CopyArtifact',
-                            filter: 'build/epf/CloseAfterUpdate.epf',
-                            fingerprintArtifacts: true,
-                            flatten: true,
-                            projectName: 'Tools'
-                    ]
-            )
-
-            s_script.step(
-                    [
-                            $class: 'CopyArtifact',
-                            filter: 'TaskFor1C.py, commands\\*',
-                            fingerprintArtifacts: true,
-                            projectName: 'TaskFor1C python3'
-                    ]
-            )
-
             final String workPath = s_script.pwd()
             ArrayList partOfText = new ArrayList()
-            partOfText.add(String.format('ci --folder "%1$s\\%2$s" --epf CloseAfterUpdate.epf', workPath, Folders.CF.m_path))
-            partOfText.add(String.format('--build_epf "%1$s"', workPath))
+            partOfText.add(String.format('base_for_test --folder "%1$s" --create_epf --create_cfe', workPath))
             if (s_runModeOrdinaryApplication) {
                 partOfText.add('--thick')
             }
@@ -432,8 +413,7 @@ final class MainBuild{
             }
 
             stashResource(baseFolder(), filePath)
-            stashResource(taskFor1C(), 'TaskFor1C.py, commands\\*')
-
+            
         }
 
     }
@@ -558,7 +538,7 @@ final class MainBuild{
                 def filesTags = [:]
                 ArrayList ignoreTags = ['tree']
 
-                def files = s_script.findFiles(glob: Folders.FEATURES.m_path + '/*.feature')
+                def files = s_script.findFiles(glob: 'build\\spec\\features' + '/*.feature')
                 for(int count = 0; count < files.size(); count++) {
                     String text = getTextFromFile(files[count].path)
                     ArrayList tags = new ArrayList()
@@ -688,25 +668,6 @@ final class MainBuild{
 
 }
 
-enum Folders{
-
-    SYNTAX('spec\\syntax'),
-
-    CF('cf'),
-    EXT('lib\\ext'),
-    FEATURES('build\\spec\\features'),
-    FIXTURES('build\\spec\\fixtures'),
-    SYNTAX_ACC(SYNTAX.m_path + '\\acc' as String),
-    SYNTAX_PLATFORM(SYNTAX.m_path + '\\platform' as String),
-    TESTS_UNIT_4('build\\spec\\tests' as String),
-
-    public final String m_path
-
-    private Folders(String path){
-        m_path = path
-    }
-}
-
 //не переносить в класс иначе не работает parallel
 def runTests(final tests){
 
@@ -772,7 +733,6 @@ abstract class TestCase implements Serializable{
                     try {
 
                         s_script.deleteDir()
-                        MainBuild.unstashResource(MainBuild.taskFor1C())
                         commandForRunTest()
 
                     }catch (exception) {
@@ -853,7 +813,7 @@ class PlatformCheck extends TestCase{
     PlatformCheck(final String name, final String node, final Boolean extendedModulesCheck){
         super(name, node)
         m_extendedModulesCheck = extendedModulesCheck
-        m_pathToConfig = Folders.SYNTAX_PLATFORM.m_path
+        m_pathToConfig = 'spec\\syntax\\platform'
     }
 
     void getResources(){
@@ -934,7 +894,7 @@ class CodeAnalysis extends TestCase{
     static final String s_command = '--thick --epf SyntaxCheckAcc.epf --options'
     static final String s_baseAcc = 'base_acc'
     static final String s_stashName = 'CodeAnalysis'
-    static final String s_pathToConfig = Folders.SYNTAX_ACC.m_path
+    static final String s_pathToConfig = 'spec\\syntax\\acc'
     private final Boolean m_split
 
     CodeAnalysis(final String name, final String node, final Boolean split){
@@ -1146,7 +1106,7 @@ class UnitTest extends TestCase{
 
     UnitTest(final String name, final String node){
         super(name, node)
-        m_pathToTest = Folders.TESTS_UNIT_4.m_path
+        m_pathToTest = 'build\\spec\\tests'
     }
 
     void getResources(){
@@ -1193,7 +1153,6 @@ class BehaveTest extends TestCase{
     private final BehaveTestType m_type
     private final String m_extensions
     private final String m_features
-    private final String m_stashNameForToolsExt
     private final String m_stashNameForExt
     private final String m_baseName
     private final String m_linkToBase
@@ -1211,7 +1170,6 @@ class BehaveTest extends TestCase{
         m_type = type
         m_extensions = extensions
         m_features = features
-        m_stashNameForToolsExt = 'BehaveTestToolsExt'
         m_stashNameForExt = name + 'Ext'
 
         m_pathToApache = 'httpd.exe'
@@ -1229,52 +1187,23 @@ class BehaveTest extends TestCase{
     void getResources(){
 
         if (!MainBuild.resourceExist(getClassName())) {
-
-            s_script.step(
-                    [
-                            $class              : 'CopyArtifact',
-                            fingerprintArtifacts: true,
-                            projectName         : 'Vanessa-behavior'
-                    ]
-            )
-
+            s_script.copyArtifacts(fingerprintArtifacts: true, projectName: 'Vanessa-behavior')
             MainBuild.stashResource(getClassName(), 'vanessa-behavior.epf, lib/FeatureReader/vbFeatureReader.epf,' +
                     ' features/Libraries/**, locales/**, plugins/**, vendor/**')
-
         }
 
         ArrayList stashStringFeature = new ArrayList()
         for(String featureName: m_features.split(',')) {
-            stashStringFeature.add(String.format( '%1$s\\%2$s', Folders.FEATURES.m_path, featureName + '.feature'))
-            stashStringFeature.add(String.format( '%1$s\\step_definitions\\%2$s', Folders.FEATURES.m_path, featureName + '.epf'))
+            stashStringFeature.add(String.format( '%1$s\\%2$s', 'build\\spec\\features', featureName + '.feature'))
+            stashStringFeature.add(String.format( '%1$s\\step_definitions\\%2$s', 'build\\spec\\features', featureName + '.epf'))
         }
         MainBuild.stashResource(getName(), stashStringFeature.join(', '))
 
         if (m_extensions != ''){
 
-            if (!MainBuild.resourceExist(m_stashNameForToolsExt)) {
-                s_script.step(
-                        [
-                                $class              : 'CopyArtifact',
-                                filter              : 'build/epf/ChangeSafeModeForExtension.epf',
-                                fingerprintArtifacts: true,
-                                projectName         : 'Tools'
-                        ]
-                )
-                s_script.step(
-                        [
-                                $class              : 'CopyArtifact',
-                                filter              : 'ext/**',
-                                fingerprintArtifacts: true,
-                                projectName         : 'Extension'
-                        ]
-                )
-                MainBuild.stashResource(m_stashNameForToolsExt, 'ext/**, build/epf/ChangeSafeModeForExtension.epf')
-            }
-
             ArrayList stashStringExt = new ArrayList()
             for(String extName: m_extensions.split(',')) {
-                stashStringExt.add(String.format( '%1$s\\%2$s\\**', Folders.EXT.m_path, extName))
+                stashStringExt.add(String.format( '%1$s\\%2$s\\**', 'spec\\ext', extName))
             }
             MainBuild.stashResource(m_stashNameForExt, stashStringExt.join(', '))
 
@@ -1292,16 +1221,14 @@ class BehaveTest extends TestCase{
         final String resultFolder = MainBuild.getResultFolder()
 
         if (m_extensions != ''){
-            MainBuild.unstashResource(m_stashNameForToolsExt)
             MainBuild.unstashResource(m_stashNameForExt)
-            MainBuild.run1C(String.format('ci_cfe --folder %1$s --tools ext --epf build\\epf\\ChangeSafeModeForExtension.epf',
-                                            Folders.EXT.m_path),
+            MainBuild.run1C(String.format('add_extensions --folder %1$s\\%2$s', workPath, 'spec\\ext'),
                             MainBuild.baseFolder())
         }
 
         String fileNameConfig = 'vanessa.json'
         final String configVanessa = """{
-                                            "КаталогФич": "${workPath}\\${Folders.FEATURES.m_path}",
+                                            "КаталогФич": "${workPath}\\build\\spec\\features",
                                             "ДелатьОтчетВФорматеАллюр": "Ложь",
                                             "КаталогOutputAllure": "${workPath}\\\\${resultFolder}",
                                             "ДелатьОтчетВФорматеCucumberJson": "Истина",
