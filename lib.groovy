@@ -29,10 +29,6 @@ def setRunModeOrdinaryApplication(){
     MainBuild.s_runModeOrdinaryApplication = true
 }
 
-def setFixturesNotExists(){
-    MainBuild.s_fixturesExists = false
-}
-
 def setPath1C(final path1C){
     MainBuild.s_path1C = path1C
 }
@@ -67,7 +63,6 @@ final class MainBuild{
     public static Boolean s_debug = false
     public static Boolean s_sendMsg = true
     public static Boolean s_runModeOrdinaryApplication = false
-    public static Boolean s_fixturesExists = true
     public static Boolean s_scanTask = true
     private static String s_baseFolder = 'base'
     private static String s_stashNameTaskFor1C = 'TaskFor1C'
@@ -423,10 +418,7 @@ final class MainBuild{
             if (s_runModeOrdinaryApplication) {
                 partOfText.add('--thick')
             }
-            if (s_fixturesExists){
-                partOfText.add(String.format('--fixtures "%1$s\\%2$s"', workPath, Folders.FIXTURES.m_path))
-            }
-
+            
             run1C(partOfText.join(' '), baseFolder())
 
             String filePath = baseFolder() + '/1Cv8.1CD'
