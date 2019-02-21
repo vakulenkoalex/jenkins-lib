@@ -364,10 +364,13 @@ final class MainBuild{
 
             }else{
                 if (s_bitbucket){
-                    String account = 'VakulenkoAleksei'
-                    s_script.git(branch: s_branch, credentialsId: '018f9d07-8f7c-41c5-9fb9-e041b1ee72b0', url: String.format('https://%1$s@bitbucket.org/pharmsklad/%2$s.git', account, s_repo))
+                    s_script.git(branch: s_branch, 
+                                 credentialsId: '018f9d07-8f7c-41c5-9fb9-e041b1ee72b0',
+                                 url: String.format('https://%1$s@bitbucket.org/pharmsklad/%2$s.git', 'VakulenkoAleksei', s_repo))
                 }else{
-                    s_script.git(branch: s_branch, credentialsId: '63bc67e4-1791-4a5c-b17e-5625d41dbdcd', url: String.format('git@w-git:%1$s.git', s_repo))
+                    s_script.git(branch: s_branch, 
+                                 credentialsId: '63bc67e4-1791-4a5c-b17e-5625d41dbdcd',
+                                 url: String.format('git@w-git:%1$s.git', s_repo))
                 }
 
             }
@@ -442,7 +445,6 @@ final class MainBuild{
             ignoreQualityGate: true,
             sourceCodeEncoding: 'UTF-8',
             tools: [s_script.taskScanner(
-                        excludePattern: Folders.CF.m_path + 'DataProcessors/xddTestRunner/**/*.bsl',
                         highTags: 'fixme',
                         ignoreCase: true,
                         includePattern: '**/*.bsl',
@@ -867,20 +869,22 @@ class PlatformCheck extends TestCase{
         final String resultName = testName + ".html"
 
         ArrayList partOfText = new ArrayList()
-        partOfText.add('check --options')
+        partOfText.add('platform_check --options')
 
         if (m_extendedModulesCheck) {
+            
+            // не убирать пробел в начале иначе не работает запуск в python
 
             if (MainBuild.getRunModeOrdinaryApplication()) {
-                partOfText.add('" -ExtendedModulesCheck"') //не убирать пробел в начале иначе не работает запуск в python
+                partOfText.add('" -ExtendedModulesCheck"')
             } else {
-                partOfText.add('"-ExtendedModulesCheck -CheckUseModality"')
+                partOfText.add('" -ExtendedModulesCheck -CheckUseModality"')
                 partOfText.add(String.format('--skip_modality %1$s\\SkipModality.txt', m_pathToConfig))
             }
 
         } else {
             
-            partOfText.add('"-ConfigLogIntegrity -IncorrectReferences -ThinClient -Server')
+            partOfText.add('" -ConfigLogIntegrity -IncorrectReferences -ThinClient -Server')
                         
              if (!MainBuild.getRunModeOrdinaryApplication()) {
                 partOfText.add('-WebClient')
@@ -943,30 +947,13 @@ class CodeAnalysis extends TestCase{
         if (!MainBuild.resourceExist(s_stashName)) {
 
             if (MainBuild.s_repo != 'Acc') {
-                s_script.step(
-                        [
-                                $class              : 'CopyArtifact',
-                                filter              : 'base/1Cv8.1CD',
-                                fingerprintArtifacts: true,
-                                flatten             : true,
-                                projectName         : 'Acc',
-                                target              : s_baseAcc
-                        ]
-                )
+                s_script.copyArtifacts(filter: 'base/1Cv8.1CD', fingerprintArtifacts: true, flatten: true, projectName: 'Acc', target: s_baseAcc)
             }else{
                 MainBuild.startBat(String.format('echo f|xcopy /y "%1$s\\1Cv8.1CD" "%2$s\\1Cv8.1CD" >nul', MainBuild.baseFolder(), s_baseAcc))
             }
 
             if (MainBuild.s_repo != 'Acc') {
-                s_script.step(
-                        [
-                                $class              : 'CopyArtifact',
-                                filter              : 'build/lib/epf/SyntaxCheckAcc.epf, lib/config/split/**',
-                                fingerprintArtifacts: true,
-                                flatten             : true,
-                                projectName         : 'Acc'
-                        ]
-                )
+                s_script.copyArtifacts(filter: 'build/lib/epf/SyntaxCheckAcc.epf, lib/config/split/**', fingerprintArtifacts: true, flatten: true, projectName: 'Acc')
             }else{
                 MainBuild.startBat('copy build\\lib\\epf\\SyntaxCheckAcc.epf SyntaxCheckAcc.epf || exit 0')
                 MainBuild.startBat('xcopy lib\\config\\split\\* %CD% || exit 0')
@@ -1171,15 +1158,7 @@ class UnitTest extends TestCase{
         MainBuild.unstashResource(MainBuild.baseFolder())
         MainBuild.unstashResource(getName())
 
-        s_script.step(
-                [
-                        $class: 'CopyArtifact',
-                        filter:  'xddTestRunner.epf, Plugins\\*.epf',
-                        fingerprintArtifacts: true,
-                        projectName: 'xUnitFor1C'
-                ]
-        )
-
+        s_script.copyArtifacts(filter: 'xddTestRunner.epf, Plugins\\*.epf', fingerprintArtifacts: true, projectName: 'xUnitFor1C')
         final String resultName = getName().toLowerCase() + ".xml"
 
         String textFile = String.format('["start", "--connection", "File=%1$s", "--epf", ' +
