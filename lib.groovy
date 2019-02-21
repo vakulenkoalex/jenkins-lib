@@ -578,7 +578,7 @@ final class MainBuild{
                     }
                     tag = deleteTag(tag, type.m_name)
                     tag = tag.replace('Расширение', '')
-                    String name = 'BehaveTest' + type.m_name + tag.replace(',', '')
+                    String name = 'Behave' + tag.replace(',', '')
 
                     debug('BehaveTest name = ' + name)
                     debug('BehaveTest type = ' + type.m_name)
