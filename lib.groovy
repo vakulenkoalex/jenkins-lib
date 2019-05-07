@@ -906,19 +906,9 @@ class CodeAnalysis extends TestCase{
 
         if (!MainBuild.resourceExist(s_stashName)) {
 
-            if (MainBuild.s_repo != 'Acc') {
-                s_script.copyArtifacts(filter: 'base/1Cv8.1CD', fingerprintArtifacts: true, flatten: true, projectName: 'Acc', target: s_baseAcc)
-            }else{
-                MainBuild.startBat(String.format('echo f|xcopy /y "%1$s\\1Cv8.1CD" "%2$s\\1Cv8.1CD" >nul', MainBuild.baseFolder(), s_baseAcc))
-            }
-
-            if (MainBuild.s_repo != 'Acc') {
-                s_script.copyArtifacts(filter: 'build/lib/epf/SyntaxCheckAcc.epf, lib/config/split/**', fingerprintArtifacts: true, flatten: true, projectName: 'Acc')
-            }else{
-                MainBuild.startBat('copy build\\lib\\epf\\SyntaxCheckAcc.epf SyntaxCheckAcc.epf || exit 0')
-                MainBuild.startBat('xcopy lib\\config\\split\\* %CD% || exit 0')
-            }
-
+            s_script.copyArtifacts(filter: 'base/1Cv8.1CD', fingerprintArtifacts: true, flatten: true, projectName: 'acc', target: s_baseAcc)
+            s_script.copyArtifacts(filter: 'build/lib/epf/SyntaxCheckAcc.epf, lib/config/split/**', fingerprintArtifacts: true, flatten: true, projectName: 'acc')
+            
             final String resource = String.format('%1$s/*, %2$s/1Cv8.1CD, SyntaxCheckAcc.epf, Part*.txt, CreateBase.txt', s_pathToConfig, s_baseAcc)
             MainBuild.stashResource(s_stashName, resource)
 
