@@ -367,7 +367,7 @@ final class MainBuild{
                 if (s_bitbucket){
                     s_script.git(branch: s_branch, 
                                  credentialsId: '018f9d07-8f7c-41c5-9fb9-e041b1ee72b0',
-                                 url: String.format('https://%1$s@bitbucket.org/pharmsklad/%2$s.git', 'VakulenkoAleksei', s_repo))
+                                 url: String.format('https://%1$s@bitbucket.org/%2$s.git', 'VakulenkoAleksei', s_repo))
                 }else{
                     s_script.git(branch: s_branch, 
                                  credentialsId: '63bc67e4-1791-4a5c-b17e-5625d41dbdcd',
