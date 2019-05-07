@@ -906,8 +906,8 @@ class CodeAnalysis extends TestCase{
 
         if (!MainBuild.resourceExist(s_stashName)) {
 
-            s_script.copyArtifacts(filter: 'base/1Cv8.1CD', fingerprintArtifacts: true, flatten: true, projectName: 'acc', target: s_baseAcc)
-            s_script.copyArtifacts(filter: 'build/lib/epf/SyntaxCheckAcc.epf', fingerprintArtifacts: true, flatten: true, projectName: 'acc')
+            s_script.copyArtifacts(filter: 'base/1Cv8.1CD', fingerprintArtifacts: true, flatten: true, projectName: 'VakulenkoAleksei/acc/master/', target: s_baseAcc)
+            s_script.copyArtifacts(filter: 'build/lib/epf/SyntaxCheckAcc.epf', fingerprintArtifacts: true, flatten: true, projectName: 'VakulenkoAleksei/acc/master/')
             
             final String resource = String.format('%1$s/*, %2$s/1Cv8.1CD, SyntaxCheckAcc.epf', s_pathToConfig, s_baseAcc)
             MainBuild.stashResource(s_stashName, resource)
