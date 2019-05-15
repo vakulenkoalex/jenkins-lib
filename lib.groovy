@@ -525,10 +525,8 @@ final class MainBuild{
             }else if (object.name == 'PlatformCheck') {
                 s_tests.add(new PlatformCheck(object.name + 'Extended', object.node, true))
                 s_tests.add(new PlatformCheck(object.name + 'Simple', '', false))
-            }else if (object.name == 'CodeAnalysis') {
-                s_tests.add(new CodeAnalysis(object.name + 'Split', object.node, true))
-            }else if (object.name == 'CodeAnalysisFull') {
-                s_tests.add(new CodeAnalysis(object.name, object.node, false))
+            else if (object.name == 'CodeAnalysisFull') {
+                s_tests.add(new CodeAnalysis(object.name, object.node))
             }else if (object.name == 'BehaveTest') {
 
                 // todo вынести в отдельную функцию получение файлов и тегов
@@ -870,37 +868,16 @@ class PlatformCheck extends TestCase{
 
 }
 
-enum CodeAnalysisType {
-    PART1('Part1', 'Part1.txt', 'fast'),
-    PART2('Part2','Part2.txt', 'fast'),
-    PART3('Part3','Part3.txt', 'fast'),
-    PART4('Part4','Part4.txt'),
-    OTHERS('Others')
-
-    public final String m_name
-    public final String m_filename
-    public final String m_node
-
-    private CodeAnalysisType(String name, String filename = '', String node = '') {
-        m_name = name
-        m_filename = filename
-        m_node = node
-    }
-
-}
-
 class CodeAnalysis extends TestCase{
 
     static final String s_command = '--thick --epf SyntaxCheckAcc.epf --options'
     static final String s_baseAcc = 'base_acc'
     static final String s_stashName = 'CodeAnalysis'
     static final String s_pathToConfig = 'spec\\syntax\\acc'
-    private final Boolean m_split
-
-    CodeAnalysis(final String name, final String node, final Boolean split){
+    
+    CodeAnalysis(final String name, final String node){
         super(name, node)
-        m_split = split
-     }
+    }
 
     void getResources(){
 
@@ -947,56 +924,15 @@ class CodeAnalysis extends TestCase{
             parameterEpf.add('IgnoreObject=' + fileNameIgnoreObject)
         }
 
-        if (m_split) {
-            parameterEpf.add('Requirements=CreateBase.txt')
-        }else {
-            parameterEpf.add(String.format('IgnoreRequirements=%1$s\\IgnoreRequirements.txt', s_pathToConfig))
-        }
-
+        parameterEpf.add(String.format('IgnoreRequirements=%1$s\\IgnoreRequirements.txt', s_pathToConfig))
+        
         MainBuild.run1C(String.format('start %1$s "%2$s"', s_command, parameterEpf.join(';')), s_baseAcc, logFileName, true)
         MainBuild.publishResultHTML(logName, logFileName)
 
         Boolean publishResult = false
 
         if (MainBuild.getResultFromFile(resultCode) == '0') {
-
-            if (m_split) {
-
-                MainBuild.stashResource(s_baseAcc, s_baseAcc + '/*')
-
-                ArrayList PartOfAnalysis = getPartOfAnalysis()
-                MainBuild.s_libScript.runTests(PartOfAnalysis)
-
-                // todo создавать единую таблицу с выравниванием колонок
-
-                ArrayList collectLines = new ArrayList()
-                Boolean splitPublishResult = false
-
-                for(TestCase object: PartOfAnalysis) {
-
-                    String objectName = object.getName()
-
-                    MainBuild.unstashResource(objectName)
-
-                    if (MainBuild.getResultFromFile(objectName + '.txt') == '0') {
-                        object.echoEmptyReport()
-                    }else{
-                        ArrayList lines = MainBuild.getTextFromFile(objectName + '.html').split(System.lineSeparator())
-                        collectLines += lines
-                        splitPublishResult = true
-                    }
-
-                }
-
-                if (splitPublishResult){
-                    MainBuild.writeTextToFile(resultName, collectLines.join(System.lineSeparator()))
-                    publishResult = true
-                }
-
-            }else{
-                echoEmptyReport()
-            }
-
+            echoEmptyReport()
         }else{
             publishResult = true
         }
@@ -1005,86 +941,6 @@ class CodeAnalysis extends TestCase{
             MainBuild.setUnstableResult(getClassName())
             MainBuild.publishResultHTML(getClassName(), resultName)
         }
-
-    }
-
-    private ArrayList getPartOfAnalysis() {
-
-        ArrayList tests = new ArrayList()
-
-        CodeAnalysisType[] valueEnum = CodeAnalysisType.values()
-        for (int i = 0; i < valueEnum.size(); i++) {
-            CodeAnalysisType element = valueEnum[i]
-            tests.add(new CodeAnalysisSplit(element.m_node, element))
-        }
-
-        return tests
-
-    }
-
-}
-
-class CodeAnalysisSplit extends TestCase{
-
-    private final CodeAnalysisType m_type
-
-    CodeAnalysisSplit(final String node, final CodeAnalysisType type){
-        super('CodeAnalysis' + type.m_name, node)
-        m_type = type
-    }
-
-    protected void commandForRunTest(){
-
-        MainBuild.unstashResource(CodeAnalysis.s_stashName)
-        MainBuild.unstashResource(CodeAnalysis.s_baseAcc)
-
-        final String resultName = getName() + ".html"
-        final String resultCode = getName() + ".txt"
-        final String logName = "Log" + getName()
-        final String logFileName = logName + ".html"
-
-        ArrayList parameterEpf = new ArrayList()
-        parameterEpf.add('NotCollectBase=1')
-        parameterEpf.add('ReportHtml=' + resultName)
-        parameterEpf.add('Result=' + resultCode)
-
-        if (m_type.m_filename != '') {
-
-            parameterEpf.add('Requirements=' + m_type.m_filename)
-            parameterEpf.add(String.format('IgnoreRequirements=%1$s\\IgnoreRequirements.txt', CodeAnalysis.s_pathToConfig))
-
-        }else{
-
-            final String pathToFile = String.format('%1$s\\IgnoreRequirements.txt', CodeAnalysis.s_pathToConfig)
-            ArrayList requirements = getRequirementsFromPartFile(pathToFile)
-
-            String fileName = 'requirements.txt'
-            MainBuild.writeTextToFile(fileName, requirements.join(System.lineSeparator()))
-            parameterEpf.add('IgnoreRequirements=' + fileName)
-
-        }
-
-        MainBuild.run1C(String.format('start %1$s "%2$s"', CodeAnalysis.s_command, parameterEpf.join(';')), CodeAnalysis.s_baseAcc, logFileName, true)
-        MainBuild.publishResultHTML(logName, logFileName)
-
-        MainBuild.stashResource(getName(), resultName + ', ' + resultCode)
-
-    }
-
-    private ArrayList getRequirementsFromPartFile(String pathToFile) {
-
-        ArrayList requirements = MainBuild.getTextFromFile(pathToFile).split(System.lineSeparator())
-        CodeAnalysisType[] valueEnum = CodeAnalysisType.values()
-        for (int i = 0; i < valueEnum.size(); i++) {
-            CodeAnalysisType element = valueEnum[i]
-            if (element.m_filename != '') {
-                ArrayList array = MainBuild.getTextFromFile(element.m_filename).split(System.lineSeparator())
-                requirements += array
-            }
-        }
-        requirements.unique()
-
-        return requirements
 
     }
 
