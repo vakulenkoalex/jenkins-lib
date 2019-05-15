@@ -91,7 +91,6 @@ final class MainBuild{
                     s_script.deleteDir()
 
                     getSource()
-                    copyIgnoreObject()
                     if (s_scanTask) {
                         getTask()
                     }
@@ -380,18 +379,6 @@ final class MainBuild{
 
     }
 
-    private static void copyIgnoreObject(){
-
-        String fileName = 'IgnoreObject.txt'
-        String filePath = 'spec\\syntax' + '\\' + fileName
-        String copyCommand = 'copy %1$s %2$s'
-        if (s_script.fileExists(filePath)){
-            startBat(String.format(copyCommand, filePath, 'spec\\syntax\\acc' + '\\' + fileName))
-            startBat(String.format(copyCommand, filePath, 'spec\\syntax\\platform' + '\\' + fileName))
-        }
-
-    }
-
     private static void createBase(){
 
         s_script.stage('CreateBase'){
@@ -525,7 +512,7 @@ final class MainBuild{
             }else if (object.name == 'PlatformCheck') {
                 s_tests.add(new PlatformCheck(object.name + 'Extended', object.node, true))
                 s_tests.add(new PlatformCheck(object.name + 'Simple', '', false))
-            else if (object.name == 'CodeAnalysisFull') {
+            }else if (object.name == 'CodeAnalysisFull') {
                 s_tests.add(new CodeAnalysis(object.name, object.node))
             }else if (object.name == 'BehaveTest') {
 
@@ -854,7 +841,7 @@ class PlatformCheck extends TestCase{
             
         }
 
-        partOfText.add(String.format('--skip_error %1$s\\IgnoreError.txt --skip_object %1$s\\IgnoreObject.txt', m_pathToConfig))
+        partOfText.add(String.format('--skip_error %1$s\\IgnoreErrors.txt --skip_object %1$s\\IgnoreObjects.txt', m_pathToConfig))
         MainBuild.run1C(partOfText.join(' '), MainBuild.baseFolder(), resultName, false)
 
         if (MainBuild.getTextFromFile(resultName) != '') {
