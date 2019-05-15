@@ -906,12 +906,12 @@ class CodeAnalysis extends TestCase{
         //if (MainBuild.s_script.fileExists(MainBuild.fileChangeObject())) {
         //    parameterEpf.add('Object=' + MainBuild.fileChangeObject())
         //}
-        final String fileNameIgnoreObject = s_pathToConfig + '\\IgnoreObject.txt'
+        final String fileNameIgnoreObject = s_pathToConfig + '\\IgnoreObjects.txt'
         if (MainBuild.s_script.fileExists(fileNameIgnoreObject)) {
-            parameterEpf.add('IgnoreObject=' + fileNameIgnoreObject)
+            parameterEpf.add('IgnoreObjects=' + fileNameIgnoreObject)
         }
 
-        parameterEpf.add(String.format('IgnoreRequirements=%1$s\\IgnoreRequirements.txt', s_pathToConfig))
+        parameterEpf.add(String.format('IgnoreErrors=%1$s\\IgnoreErrors.txt', s_pathToConfig))
         
         MainBuild.run1C(String.format('start %1$s "%2$s"', s_command, parameterEpf.join(';')), s_baseAcc, logFileName, true)
         MainBuild.publishResultHTML(logName, logFileName)
