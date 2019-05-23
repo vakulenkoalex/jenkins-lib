@@ -68,7 +68,7 @@ final class MainBuild{
     public static Boolean s_sendMsg = true
     public static Boolean s_runModeOrdinaryApplication = false
     public static Boolean s_scanTask = true
-    public static Boolean s_useChangeObjects = true
+    public static Boolean s_useChangeObjects = false
     private static String s_baseFolder = 'base'
     private static String s_fileСhangeObject = 'Object.txt'
     private static ArrayList s_tests = new ArrayList()
