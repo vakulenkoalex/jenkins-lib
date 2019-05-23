@@ -47,6 +47,10 @@ def setArtifactsPath(final String path){
     MainBuild.s_artifactsPath = path
 }
 
+def useChangeObjects(){
+    MainBuild.s_useChangeObjects = true
+}
+
 //ядро
 
 final class MainBuild{
@@ -64,6 +68,7 @@ final class MainBuild{
     public static Boolean s_sendMsg = true
     public static Boolean s_runModeOrdinaryApplication = false
     public static Boolean s_scanTask = true
+    public static Boolean s_useChangeObjects = true
     private static String s_baseFolder = 'base'
     private static String s_fileСhangeObject = 'Object.txt'
     private static ArrayList s_tests = new ArrayList()
@@ -323,6 +328,10 @@ final class MainBuild{
 
         s_script.currentBuild.description = addTextToString(s_script.currentBuild.description, testName)
 
+    }
+
+    static Boolean getUseChangeObjects(){
+        return s_useChangeObjects
     }
 
     private static void sortTestsByNode(){
@@ -861,7 +870,8 @@ class CodeAnalysis extends TestCase{
     static final String s_baseAcc = 'base_acc'
     static final String s_stashName = 'CodeAnalysis'
     static final String s_pathToConfig = 'spec\\syntax\\acc'
-    
+    static final String s_changeObjects = "objects_acc.txt"
+
     CodeAnalysis(final String name, final String node){
         super(name, node)
     }
@@ -890,7 +900,7 @@ class CodeAnalysis extends TestCase{
         final String resultCode = testName + ".txt"
         final String logName = "Log" + testName
         final String logFileName = logName + ".html"
-
+        
         MainBuild.run1C('reg_server')
 
         ArrayList parameterEpf = new ArrayList()
@@ -903,9 +913,11 @@ class CodeAnalysis extends TestCase{
         if (path1C != ''){
             parameterEpf.add('Path=' + path1C)
         }
-        //if (MainBuild.s_script.fileExists(MainBuild.fileChangeObject())) {
-        //    parameterEpf.add('Object=' + MainBuild.fileChangeObject())
-        //}
+        if ((MainBuild.getUseChangeObjects()) && (MainBuild.s_script.fileExists(MainBuild.fileChangeObject()))) {
+            if (getFileChangeObjectForCodeAnalysis(MainBuild.fileChangeObject())){
+                parameterEpf.add('Objects=' + s_changeObjects)
+            }
+        }
         final String fileNameIgnoreObject = s_pathToConfig + '\\IgnoreObjects.txt'
         if (MainBuild.s_script.fileExists(fileNameIgnoreObject)) {
             parameterEpf.add('IgnoreObjects=' + fileNameIgnoreObject)
@@ -928,6 +940,92 @@ class CodeAnalysis extends TestCase{
             MainBuild.setUnstableResult(getClassName())
             MainBuild.publishResultHTML(getClassName(), resultName)
         }
+
+    }
+
+    private static Boolean getFileChangeObjectForCodeAnalysis(final String fileName){
+        
+        Boolean createFile = false
+
+        String text = MainBuild.getTextFromFile(fileName)
+        ArrayList newLines = new ArrayList()
+        def matcher = text =~ /cf\/.+\/.+/
+        while(matcher.find()) {
+            String fullPath = text.substring(matcher.start() + 3, matcher.end())
+            ArrayList array = fullPath.split("/")
+            newLines.add(GetObjectName(array[0]) + "." + array[1])
+        }
+        
+        if (newLines.size()>0){
+            MainBuild.writeTextToFile(s_changeObjects, newLines.join(System.lineSeparator()))
+            createFile = true
+        }
+
+        return createFile
+
+    }
+
+    private static String GetObjectName(final String objectPath){
+        
+        String objectName = ""
+
+        switch(objectPath) {
+            case "BusinessProcesses":
+                objectName = "БизнесПроцессы"
+                break
+            case "Documents":
+                objectName = "Документы"
+                break
+            case "DocumentJournals":
+                objectName = "ЖурналыДокументов"
+                break
+            case "Tasks":
+                objectName = "Задачи"
+                break
+            case "Constants":
+                objectName = "Константы"
+                break
+            case "DataProcessors":
+                objectName = "Обработки"
+                break
+            case "WebServices":
+                objectName = "WebСервисы"
+                break
+            case "FilterCriteria":
+                objectName = "КритерииОтбора"
+                break
+            case "CommonModules":
+                objectName = "ОбщиеМодули"
+                break
+            case "CommonForms":
+                objectName = "ОбщиеФормы"
+                break
+            case "ExchangePlans":
+                objectName = "ПланыОбмена"
+                break
+            case "Reports":
+                objectName = "Отчеты"
+                break
+            case "Enums":
+                objectName = "Перечисления"
+                break
+            case "ChartsOfCharacteristicTypes":
+                objectName = "ПланыВидовХарактеристик"
+                break
+            case "AccumulationRegisters":
+                objectName = "РегистрыНакопления"
+                break
+            case "InformationRegisters":
+                objectName = "РегистрыСведений"
+                break
+            case "Catalogs":
+                objectName = "Справочники"
+                break
+            default:
+                objectName = 'error'
+        }
+
+        return objectName
 
     }
 
