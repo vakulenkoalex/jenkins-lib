@@ -1210,15 +1210,15 @@ class BehaveTest extends TestCase{
 
         if (m_type==BehaveTestType.WEB){
 
-            //todo найти ключ для запуска браузера без ошибок после принудительного завершения (пока просто очищаю кэш)
             MainBuild.startBat('taskkill /IM chrome.exe /F || exit 0')
-            MainBuild.startBat('rd /Q /S "%userprofile%\\AppData\\Local\\Google\\Chrome\\User Data\\Default"')
-
             MainBuild.startBat('taskkill /IM ' + m_pathToApache + ' /F || exit 0')
 
             MainBuild.startBat('rmdir ' + m_linkToBase)
             MainBuild.startBat(String.format('copy %1$s\\%2$s %3$s /y || exit 0', s_script.pwd(), m_confName, m_confDir))
             MainBuild.startBat('rmdir ' + m_webDir + ' /S /Q')
+
+            //todo найти ключ для запуска браузера без ошибок после принудительного завершения (пока просто очищаю кэш)
+            MainBuild.startBat('rd /Q /S "%userprofile%\\AppData\\Local\\Google\\Chrome\\User Data\\Default"')
 
         }
 
