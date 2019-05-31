@@ -1186,19 +1186,7 @@ class BehaveTest extends TestCase{
             MainBuild.startBat(String.format('copy %1$s %2$s || exit 0', m_pathToConf, workPath))
             MainBuild.startBat(String.format('MKLINK /D %1$s %2$s\\%3$s || exit 0', m_linkToBase, workPath, MainBuild.baseFolder()))
 
-            ArrayList partOfWebinst = new ArrayList()
-            partOfWebinst.add('[' + '"webinst"')
-            partOfWebinst.add('"--params"')
-            ArrayList partOfApache = new ArrayList()
-            partOfApache.add('"-apache22')
-            partOfApache.add(String.format('-wsdir %1$s', m_baseName.replace('\\', '\\\\')))
-            partOfApache.add(String.format('-dir %1$s', m_webDir.replace('\\', '\\\\')))
-            partOfApache.add(String.format('-connstr File=\\\"%1$s\\\";', m_linkToBase.replace('\\', '\\\\')))
-            partOfApache.add(String.format('-confpath %1$s"', m_pathToConf.replace('\\', '\\\\')))
-            partOfWebinst.add(partOfApache.join(' ') + ']')
-            String fileNamePublish = 'webinst.json'
-            MainBuild.writeTextToFile(fileNamePublish, partOfWebinst.join(', '))
-            MainBuild.run1C('file --params ' + fileNamePublish)
+            MainBuild.run1C(String.format('webinst --wsdir %1$s --dir %2$s --confpath %3$s', m_baseName, m_webDir, m_pathToConf), MainBuild.baseFolder())
 
             changeAlias(m_pathToConf, m_baseName)
             MainBuild.startBat('start ' + m_commandStartApache)
