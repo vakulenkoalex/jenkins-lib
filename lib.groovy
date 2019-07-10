@@ -1145,6 +1145,7 @@ class BehaveTest extends TestCase{
         MainBuild.unstashResource(getName())
 
         final String workPath = s_script.pwd()
+        final String workPathForJson = workPath.replace('\\', '\\\\')
         final String resultFolder = MainBuild.getResultFolder()
 
         if (m_extensions != ''){
@@ -1155,9 +1156,9 @@ class BehaveTest extends TestCase{
 
         String fileNameConfig = 'vanessa.json'
         final String configVanessa = """{
-                                            "КаталогФич": "${workPath}\\\\build\\\\spec\\\\features",
+                                            "КаталогФич": "${workPathForJson}\\\\build\\\\spec\\\\features",
                                             "ДелатьОтчетВФорматеCucumberJson": "Истина",
-                                            "КаталогOutputCucumberJson": "${workPath}\\\\${resultFolder}",
+                                            "КаталогOutputCucumberJson": "${workPathForJson}\\\\${resultFolder}",
                                             "ЗавершитьРаботуСистемы": "Истина",
                                             "ВыполнитьСценарии": "Истина",
                                             "СписокТеговИсключение": "Draft"
