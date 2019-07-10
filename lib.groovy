@@ -1115,9 +1115,8 @@ class BehaveTest extends TestCase{
     void getResources(){
 
         if (!MainBuild.resourceExist(getClassName())) {
-            s_script.copyArtifacts(fingerprintArtifacts: true, projectName: 'Vanessa-behavior')
-            MainBuild.stashResource(getClassName(), 'vanessa-behavior.epf, lib/FeatureReader/vbFeatureReader.epf,' +
-                    ' features/Libraries/**, locales/**, plugins/**, vendor/**')
+            s_script.copyArtifacts(fingerprintArtifacts: true, projectName: 'add')
+            MainBuild.stashResource(getClassName(), 'bddRunner.epf, lib/featurereader/vbFeatureReader.epf, features/libraries/**, locales/**, plugins/**, vendor/**')
         }
 
         ArrayList stashStringFeature = new ArrayList()
@@ -1156,15 +1155,11 @@ class BehaveTest extends TestCase{
 
         String fileNameConfig = 'vanessa.json'
         final String configVanessa = """{
-                                            "КаталогФич": "${workPath}\\build\\spec\\features",
-                                            "ДелатьОтчетВФорматеАллюр": "Ложь",
-                                            "КаталогOutputAllure": "${workPath}\\\\${resultFolder}",
+                                            "КаталогФич": "${workPath}\\\\build\\\\spec\\\\features",
                                             "ДелатьОтчетВФорматеCucumberJson": "Истина",
                                             "КаталогOutputCucumberJson": "${workPath}\\\\${resultFolder}",
-                                            "КаталогиБиблиотек": "${workPath}\\features\\Libraries",
                                             "ЗавершитьРаботуСистемы": "Истина",
                                             "ВыполнитьСценарии": "Истина",
-                                            "ТаймаутЗапуска1С": "60",
                                             "СписокТеговИсключение": "Draft"
                                         }
                                     """
@@ -1172,7 +1167,7 @@ class BehaveTest extends TestCase{
 
         ArrayList partOfText = new ArrayList()
         partOfText.add('start --test_manager')
-        partOfText.add('--epf vanessa-behavior.epf')
+        partOfText.add('--epf bddRunner.epf')
         partOfText.add(String.format('--options "StartFeaturePlayer;VBParams=%1$s\\%2$s"', workPath, fileNameConfig))
 
         if (m_type==BehaveTestType.WEB){
