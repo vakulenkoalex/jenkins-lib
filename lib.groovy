@@ -567,8 +567,6 @@ final class MainBuild{
                     BehaveTestType type = BehaveTestType.THIN
                     if (tag.contains(BehaveTestType.WEB.m_name)){
                         type = BehaveTestType.WEB
-                    }else if (tag.contains(BehaveTestType.THICK.m_name)){
-                        type = BehaveTestType.THICK
                     }
                     tag = deleteTag(tag, type.m_name)
                     tag = tag.replace('Расширение', '')
@@ -1068,7 +1066,6 @@ class UnitTest extends TestCase{
 }
 
 enum BehaveTestType {
-    THICK('Thick'),
     THIN('Thin'),
     WEB('Web')
 
@@ -1178,10 +1175,7 @@ class BehaveTest extends TestCase{
         partOfText.add('--epf vanessa-behavior.epf')
         partOfText.add(String.format('--options "StartFeaturePlayer;VBParams=%1$s\\%2$s"', workPath, fileNameConfig))
 
-        if (m_type==BehaveTestType.THICK){
-            partOfText.add('--thick')
-            MainBuild.run1C('reg_server')
-        }else if (m_type==BehaveTestType.WEB){
+        if (m_type==BehaveTestType.WEB){
 
             MainBuild.startBat(String.format('copy %1$s %2$s || exit 0', m_pathToConf, workPath))
             MainBuild.startBat(String.format('MKLINK /D %1$s %2$s\\%3$s || exit 0', m_linkToBase, workPath, MainBuild.baseFolder()))
