@@ -1047,7 +1047,7 @@ class UnitTest extends TestCase{
         MainBuild.unstashResource(MainBuild.baseFolder())
         MainBuild.unstashResource(getName())
 
-        s_script.copyArtifacts(filter: 'xddTestRunner.epf, Plugins\\*.epf', fingerprintArtifacts: true, projectName: 'xUnitFor1C')
+        s_script.copyArtifacts(filter: 'xddTestRunner.epf, plugins\\*.epf', fingerprintArtifacts: true, projectName: 'add')
         final String resultName = getName().toLowerCase() + ".xml"
 
         String textFile = String.format('["start", "--connection", "File=%1$s", "--epf", ' +
