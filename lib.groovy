@@ -1152,7 +1152,7 @@ class BehaveTest extends TestCase{
                                             "КаталогOutputCucumberJson": "${workPathForJson}\\\\${resultFolder}",
                                             "ЗавершитьРаботуСистемы": "Истина",
                                             "ВыполнитьСценарии": "Истина",
-                                            "СписокТеговИсключение": "Draft"
+                                            "СписокТеговИсключение": "IgnoreOnCIMainBuild"
                                         }
                                     """
         MainBuild.writeTextToFile(fileNameConfig, configVanessa)
