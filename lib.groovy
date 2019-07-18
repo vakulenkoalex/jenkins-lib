@@ -521,7 +521,7 @@ final class MainBuild{
                 ArrayList fileName = new ArrayList()
                 ArrayList tagName = new ArrayList()
                 def filesTags = [:]
-                ArrayList ignoreTags = ['tree']
+                ArrayList ignoreTags = ['tree', 'ExportScenarios', 'IgnoreOnCIMainBuild']
 
                 def files = s_script.findFiles(glob: 'build\\spec\\features' + '/*.feature')
                 for(int count = 0; count < files.size(); count++) {
