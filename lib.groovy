@@ -363,7 +363,8 @@ final class MainBuild{
                                         daysToKeepStr: '',
                                         numToKeepStr: '10'
                                 )
-                        )
+                        ),
+                        s_script.copyArtifactPermission('*')
                 ]
                 )
 
