@@ -1,5 +1,5 @@
 
-//методы для jenkins
+// методы для jenkins
 
 def setScript(final script){
     MainBuild.s_script = script
@@ -50,7 +50,7 @@ def useChangeObjects(){
     MainBuild.s_useChangeObjects = true
 }
 
-//ядро
+// ядро
 
 final class MainBuild{
 
@@ -572,7 +572,8 @@ final class MainBuild{
                     s_tests.add(new BehaveTest(name, '', type, file, tag))
 
                 }
-
+            }else if (object.name == 'SonarQube') {
+                s_tests.add(new SonarQube(object.name, object.node))
             }
         }
         sortTestsByNode()
@@ -588,25 +589,33 @@ final class MainBuild{
         s_script.deleteDir()
 
         Boolean BehaveTestExists = false
+        Boolean SonarQubeExists = false
 
         for(TestCase object: s_tests) {
-            if (!object.getPublishResult()){
+            if (object.getClassName() == 'BehaveTest'){
                 unstashResource(object.getStashNameForResult())
-                if (object.getClassName() == 'BehaveTest'){
-                    BehaveTestExists = true
-                }
+                BehaveTestExists = true
+            }else if (object.getClassName() == 'SonarQube'){
+                SonarQubeExists = true
             }
         }
 
         if (BehaveTestExists){
             String resultFolder = getResultFolder()
-            //s_script.allure(includeProperties: false, jdk: '', results: [[path: resultFolder]])
-            //setResultAllure('Allure', resultFolder)
             s_script.cucumber(buildStatus: 'UNSTABLE',
                                 failedStepsNumber: 1,
                                 fileIncludePattern: '**/*.json',
                                 jsonReportDirectory: resultFolder,
                                 sortingMethod: 'ALPHABETICAL')
+        }
+
+        if (SonarQubeExists){
+            s_script.timeout(time: 1, unit: 'HOURS') {
+                def QualityGate = s_script.waitForQualityGate()
+                if (QualityGate.status != 'OK') {
+                    MainBuild.setUnstableResult('SonarQube')
+                }  
+            }  
         }
 
     }
@@ -652,7 +661,7 @@ final class MainBuild{
 
 }
 
-//не переносить в класс иначе не работает parallel
+// не переносить в класс иначе не работает parallel
 def runTests(final tests){
 
     def stepsForParallel = [:]
@@ -697,12 +706,10 @@ abstract class TestCase implements Serializable{
     public static s_script
     protected final String m_node
     protected final String m_name
-    protected final Boolean m_publishResult
-
-    TestCase(final String name, final String node, final Boolean publishResult = true){
+    
+    TestCase(final String name, final String node){
         m_node = node
         m_name = name
-        m_publishResult = publishResult
     }
 
     def runTest(){
@@ -755,10 +762,6 @@ abstract class TestCase implements Serializable{
 
     String getNode(){
         return m_node
-    }
-
-    Boolean getPublishResult(){
-        return m_publishResult
     }
 
     String getClassName(){
@@ -1086,7 +1089,7 @@ class BehaveTest extends TestCase{
 
     BehaveTest(final String name, final String node, final BehaveTestType type, final String features, final String extensions = ''){
 
-        super(name, node, false)
+        super(name, node)
         m_type = type
         m_extensions = extensions
         m_features = features
@@ -1199,18 +1202,41 @@ class BehaveTest extends TestCase{
             MainBuild.startBat(String.format('copy %1$s\\%2$s %3$s /y || exit 0', s_script.pwd(), m_confName, m_confDir))
             MainBuild.startBat('rmdir ' + m_webDir + ' /S /Q')
 
-            //todo найти ключ для запуска браузера без ошибок после принудительного завершения (пока просто очищаю кэш)
+            // todo найти ключ для запуска браузера без ошибок после принудительного завершения (пока просто очищаю кэш)
             MainBuild.startBat('rd /Q /S "%userprofile%\\AppData\\Local\\Google\\Chrome\\User Data\\Default"')
 
         }
 
     }
 
-    //не делать static иначе не работает на jenkins
+    // не делать static иначе не работает на jenkins
     private void changeAlias(final String pathToConf, final String oldAlias){
 
         final String text = MainBuild.getTextFromFile(pathToConf)
         MainBuild.writeTextToFile(pathToConf, text.replaceAll(oldAlias, ''))
+
+    }
+
+}
+
+class SonarQube extends TestCase{
+
+    SonarQube(final String name, final String node){
+        super(name, node)
+    }
+
+    void getResources(){
+        MainBuild.stashResource(getName(), 'sonar-project.properties, **/*.bsl')
+    }
+
+    protected void commandForRunTest(){
+        
+        MainBuild.unstashResource(getName())
+
+        def scannerHome = s_script.tool(name: 'sonar', type: 'hudson.plugins.sonar.SonarRunnerInstallation');
+        s_script.withSonarQubeEnv(installationName: 'sonar') {
+            MainBuild.startBat("${scannerHome}/bin/sonar-scanner")
+        }
 
     }
 
