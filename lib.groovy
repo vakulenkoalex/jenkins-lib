@@ -332,6 +332,20 @@ final class MainBuild{
         return s_useChangeObjects
     }
 
+    static String getBranch(){
+    
+        String branch = ''
+
+        if (s_multibranch){
+            branch = s_script.env.BRANCH_NAME
+        }else{
+            branch = s_branch
+        }
+
+        return branch
+
+    } 
+
     private static void sortTestsByNode(){
 
         ArrayList newTests = new ArrayList()
@@ -1235,7 +1249,10 @@ class SonarQube extends TestCase{
 
         def scannerHome = s_script.tool(name: 'sonar', type: 'hudson.plugins.sonar.SonarRunnerInstallation');
         s_script.withSonarQubeEnv(installationName: 'sonar') {
-            MainBuild.startBat("${scannerHome}/bin/sonar-scanner")
+            ArrayList sonarcommand = new ArrayList()
+            sonarcommand.add(String.format('%1$s/bin/sonar-scanner', scannerHome))
+            sonarcommand.add(String.format('-Dsonar.branch.name=%1$s', MainBuild.getBranch()))
+            MainBuild.startBat(sonarcommand.join(' '))
         }
 
     }
