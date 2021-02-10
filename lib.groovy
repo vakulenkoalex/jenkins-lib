@@ -61,6 +61,8 @@ final class MainBuild{
     public static String s_branch = ''
     public static String s_path1C = ''
     public static String s_artifactsPath = ''
+    public static String s_repo_from_scm = ''
+    public static String s_sonar_host_url = ''
     public static Boolean s_multibranch = true
     public static Boolean s_debug = false
     public static Boolean s_sendMsg = true
@@ -346,6 +348,20 @@ final class MainBuild{
 
     } 
 
+    static String getRepo(){
+    
+        String repo = ''
+
+        if (s_multibranch){
+            repo = s_repo_from_scm
+        }else{
+            repo = s_repo
+        }
+
+        return repo
+
+    } 
+
     private static void sortTestsByNode(){
 
         ArrayList newTests = new ArrayList()
@@ -382,7 +398,8 @@ final class MainBuild{
                 ]
                 )
 
-                s_script.checkout(s_script.scm)
+                def scmVars = s_script.checkout(s_script.scm)
+                s_repo_from_scm = scmVars.GIT_URL.tokenize('/.')[-2]
 
             }else{
                 s_script.git(branch: s_branch, 
@@ -624,12 +641,20 @@ final class MainBuild{
         }
 
         if (SonarQubeExists){
+            
+            String link = String.format('<a href="%1$s/dashboard?id=%2$s&branch=%3$s">SonarQube</a>', s_sonar_host_url, MainBuild.getRepo(), MainBuild.getBranch())
+            MainBuild.debug('SonarQube = ' + link)
+            
+            def summary = s_script.createSummary(icon: "/static/8361d0d6/images/16x16/terminal.png")
+            summary.appendText(link)
+
             s_script.timeout(time: 1, unit: 'HOURS') {
                 def QualityGate = s_script.waitForQualityGate()
                 if (QualityGate.status != 'OK') {
                     MainBuild.setUnstableResult('SonarQube')
                 }  
-            }  
+            }
+
         }
 
     }
@@ -1249,9 +1274,10 @@ class SonarQube extends TestCase{
 
         def scannerHome = s_script.tool(name: 'sonar', type: 'hudson.plugins.sonar.SonarRunnerInstallation');
         s_script.withSonarQubeEnv(installationName: 'sonar') {
+            MainBuild.s_sonar_host_url = s_script.env.SONAR_HOST_URL
             ArrayList sonarcommand = new ArrayList()
             sonarcommand.add(String.format('%1$s/bin/sonar-scanner', scannerHome))
-            sonarcommand.add(String.format('-Dsonar.branch.name=%1$s', MainBuild.getBranch()))
+            sonarcommand.add(String.format('-Dsonar.branch.name=%1$s -Dsonar.projectKey=%2$s', MainBuild.getBranch(), MainBuild.getRepo()))
             MainBuild.startBat(sonarcommand.join(' '))
         }
 
