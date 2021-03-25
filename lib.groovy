@@ -865,7 +865,7 @@ class PlatformCheck extends TestCase{
                 partOfText.add('" -ExtendedModulesCheck"')
             } else {
                 partOfText.add('" -ExtendedModulesCheck -CheckUseModality"')
-                partOfText.add(String.format('--skip_modality %1$s\\SkipModality.txt', m_pathToConfig))
+                partOfText.add(String.format('--skip_modality "%1$s\\SkipModality.txt"', m_pathToConfig))
             }
 
         } else {
@@ -882,7 +882,7 @@ class PlatformCheck extends TestCase{
             
         }
 
-        partOfText.add(String.format('--skip_error %1$s\\IgnoreErrors.txt --skip_object %1$s\\IgnoreObjects.txt', m_pathToConfig))
+        partOfText.add(String.format('--skip_error "%1$s\\IgnoreErrors.txt" --skip_object "%1$s\\IgnoreObjects.txt"', m_pathToConfig))
         MainBuild.run1C(partOfText.join(' '), MainBuild.baseFolder(), resultName, false)
 
         if (MainBuild.getTextFromFile(resultName) != '') {
