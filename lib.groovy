@@ -648,11 +648,13 @@ final class MainBuild{
             def summary = s_script.createSummary(icon: "/static/8361d0d6/images/16x16/terminal.png")
             summary.appendText(link)
 
-            s_script.timeout(time: 1, unit: 'HOURS') {
-                def QualityGate = s_script.waitForQualityGate()
-                if (QualityGate.status != 'OK') {
-                    MainBuild.setUnstableResult('SonarQube')
-                }  
+            if (s_script.env.waitForSonar == 'true'){
+                s_script.timeout(time: 1, unit: 'HOURS') {
+                    def QualityGate = s_script.waitForQualityGate()
+                    if (QualityGate.status != 'OK') {
+                        MainBuild.setUnstableResult('SonarQube')
+                    }  
+                }
             }
 
         }
