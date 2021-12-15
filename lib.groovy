@@ -548,7 +548,7 @@ final class MainBuild{
                 s_tests.add(new CodeAnalysis(object.name, object.node))
             }else if (object.name == 'BehaveTest') {
 
-                Map<String,String> filesWithTags = getTagsInFiles(s_script.findFiles(glob: 'build\\spec\\features' + '/*.feature'))
+                Map<String,String> filesWithTags = getTagsInFiles(s_script.findFiles(glob: 'build/spec/features/*.feature'))
 
                 for(filesTags in filesWithTags) {
 
@@ -681,7 +681,7 @@ final class MainBuild{
         for(int count = 0; count < files.size(); count++) {
             
             def file = files[count] 
-            String fileName = file.name.replaceFirst(~/\.[^\.]+$/, '') // убрал расширение
+            String fileName = file.path
             String text = getTextFromFile(file.path)
             
             ArrayList tags = new ArrayList()
@@ -1171,8 +1171,9 @@ class BehaveTest extends TestCase{
 
         ArrayList stashStringFeature = new ArrayList()
         for(String featureName: m_features.split(',')) {
-            stashStringFeature.add(String.format( '%1$s\\%2$s', 'build\\spec\\features', featureName + '.feature'))
-            stashStringFeature.add(String.format( '%1$s\\step_definitions\\%2$s', 'build\\spec\\features', featureName + '.epf'))
+            stashStringFeature.add(featureName)
+            String epf = featureName.replace('.feature', '.epf')
+            stashStringFeature.add(epf.replace('build\\spec\\features', 'build\\spec\\features\\step_definitions'))
         }
         MainBuild.stashResource(getName(), stashStringFeature.join(', '))
 
