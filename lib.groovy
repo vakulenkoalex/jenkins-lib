@@ -540,7 +540,33 @@ final class MainBuild{
 
         for(object in s_testName) {
             if (object.name == 'UnitTest') {
-                s_tests.add(new UnitTest(object.name, object.node))
+                
+                Map<String,String> filesWithTags = getTagsInFiles(s_script.findFiles(glob: 'spec/tests/**/*.bsl'))
+
+                for(filesTags in filesWithTags) {
+
+                    // todo придумать правило формирование имени чтобы было более читаемо
+
+                    String tag = filesTags.value
+                    String file = filesTags.key
+
+                    UnitTestType type = UnitTestType.THIN
+                    if (tag.contains(UnitTestType.THICK.m_name)){
+                        type = UnitTestType.THICK
+                    }
+                    tag = deleteTag(tag, type.m_name)
+                    tag = tag.replace('Расширение', '')
+                    String name = 'Unit' + tag.replace(',', '')
+
+                    debug('UnitTest name = ' + name)
+                    debug('UnitTest type = ' + type.m_name)
+                    debug('UnitTest tests = ' + file)
+                    debug('UnitTest extensions = ' + tag)
+
+                    s_tests.add(new UnitTest(name, '', type, file, tag))
+
+                }
+            
             }else if (object.name == 'PlatformCheck') {
                 s_tests.add(new PlatformCheck(object.name + 'Extended', object.node, true))
                 s_tests.add(new PlatformCheck(object.name + 'Simple', '', false))
@@ -1079,31 +1105,92 @@ class CodeAnalysis extends TestCase{
 
 }
 
+enum UnitTestType {
+    THIN('Thin'),
+    THICK('Thick')
+
+    public final String m_name
+
+    private UnitTestType(String name) {
+        m_name = name
+    }
+}
+
 class UnitTest extends TestCase{
 
-    private final String m_pathToTest
+    private final UnitTestType m_type
+    private final String m_extensions
+    private final String m_tests
+    private final String m_stashNameForExt
 
-    UnitTest(final String name, final String node){
+    UnitTest(final String name, final String node, final UnitTestType type, final String tests, final String extensions = ''){
+        
         super(name, node)
-        m_pathToTest = 'build\\spec\\tests'
+        
+        m_type = type
+        m_extensions = extensions
+        m_tests = tests
+        m_stashNameForExt = name + 'Ext'
+
     }
 
     void getResources(){
-        MainBuild.stashResource(getName(), m_pathToTest + '/*')
+        
+        if (!MainBuild.resourceExist(getClassName())) {
+            s_script.copyArtifacts(fingerprintArtifacts: true, projectName: 'add')
+            MainBuild.stashResource(getClassName(), 'xddTestRunner.epf, plugins\\*.epf')
+        }
+
+        ArrayList stashStringTest = new ArrayList()
+        for(String testName: m_tests.split(',')) {
+            stashStringTest.add('build\\' + testName.replace('\\Ext\\ObjectModule.bsl', '.epf'))
+        }
+        MainBuild.stashResource(getName(), stashStringTest.join(', '))
+
+        if (m_extensions != ''){
+
+            ArrayList stashStringExt = new ArrayList()
+            for(String extName: m_extensions.split(',')) {
+                stashStringExt.add(String.format( '%1$s\\%2$s\\**', 'spec\\ext', extName))
+            }
+            MainBuild.stashResource(m_stashNameForExt, stashStringExt.join(', '))
+
+        }
+
     }
 
     protected void commandForRunTest(){
 
         MainBuild.unstashResource(MainBuild.baseFolder())
+        MainBuild.unstashResource(getClassName())
         MainBuild.unstashResource(getName())
+
+        final String workPath = s_script.pwd()
+        
+        if (m_extensions != ''){
+            MainBuild.unstashResource(m_stashNameForExt)
+            MainBuild.run1C(String.format('add_extensions --folder %1$s\\%2$s', workPath, 'spec\\ext'),
+                            MainBuild.baseFolder())
+        }
 
         s_script.copyArtifacts(filter: 'xddTestRunner.epf, plugins\\*.epf', fingerprintArtifacts: true, projectName: 'add')
         final String resultName = getName().toLowerCase() + ".xml"
 
-        String textFile = String.format('["start", "--connection", "File=%1$s", "--epf", ' +
-                                    '"%2$s\\xddTestRunner.epf", "--options", "xddRun ЗагрузчикКаталога %2$s\\%3$s;' +
-                                    'xddReport ГенераторОтчетаJUnitXML %2$s\\%4$s;xddShutdown;"]',
-                                    MainBuild.baseFolder(), s_script.pwd(), m_pathToTest, resultName)
+        ArrayList partOfText = new ArrayList()
+        partOfText.add('"start"')
+
+        if (m_type == UnitTestType.THICK){
+            partOfText.add('"--thick"')    
+        }
+
+        partOfText.add('"--connection"')
+        partOfText.add('"File=%1$s"')
+        partOfText.add('"--epf"')
+        partOfText.add('"%2$s\\xddTestRunner.epf"')
+        partOfText.add('"--options"')
+        partOfText.add('"xddRun ЗагрузчикКаталога %2$s\\%3$s;xddReport ГенераторОтчетаJUnitXML %2$s\\%4$s;xddShutdown;"')
+
+        String textFile = String.format('[' + partOfText.join(',') + ']', MainBuild.baseFolder(), s_script.pwd(), 'build\\spec\\tests', resultName)
 
         String fileName = 'xUnit.json'
         MainBuild.writeTextToFile(fileName, textFile.replace('\\', '\\\\'))
