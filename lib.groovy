@@ -548,44 +548,14 @@ final class MainBuild{
                 s_tests.add(new CodeAnalysis(object.name, object.node))
             }else if (object.name == 'BehaveTest') {
 
-                // todo вынести в отдельную функцию получение файлов и тегов
+                Map<String,String> filesWithTags = getTagsInFiles(s_script.findFiles(glob: 'build\\spec\\features' + '/*.feature'))
 
-                ArrayList fileName = new ArrayList()
-                ArrayList tagName = new ArrayList()
-                def filesTags = [:]
-                ArrayList ignoreTags = ['tree', 'ExportScenarios', 'IgnoreOnCIMainBuild']
-
-                def files = s_script.findFiles(glob: 'build\\spec\\features' + '/*.feature')
-                for(int count = 0; count < files.size(); count++) {
-                    String text = getTextFromFile(files[count].path)
-                    ArrayList tags = new ArrayList()
-                    def matcher = text =~ /@.+/
-                    while(matcher.find()) {
-                        String tag = text.substring(matcher.start() + 1, matcher.end())
-                        if (!(tag in ignoreTags)){
-                            tags.add(tag)
-                        }
-                    }
-                    filesTags.put(files[count].name.replace('.feature', ''), tags.join(','))
-                }
-
-                for (ext in filesTags.values().unique()){
-                    ArrayList file = new ArrayList()
-                    for(featureTag in filesTags) {
-                        if (featureTag.value == ext){
-                            file.add(featureTag.key)
-                        }
-                    }
-                    fileName.add(file.join(','))
-                    tagName.add(ext)
-                }
-
-                for(int count = 0; count < fileName.size(); count++) {
+                for(filesTags in filesWithTags) {
 
                     // todo придумать правило формирование имени чтобы было более читаемо
 
-                    String tag = tagName[count]
-                    String file = fileName[count]
+                    String tag = filesTags.value
+                    String file = filesTags.key
 
                     BehaveTestType type = BehaveTestType.THIN
                     if (tag.contains(BehaveTestType.WEB.m_name)){
@@ -603,6 +573,7 @@ final class MainBuild{
                     s_tests.add(new BehaveTest(name, '', type, file, tag))
 
                 }
+
             }else if (object.name == 'SonarQube') {
                 s_tests.add(new SonarQube(object.name, object.node))
             }
@@ -698,6 +669,49 @@ final class MainBuild{
 
     private static void showError(exception) {
         echoColourText('ERROR: ' + exception.getMessage(), 31)
+    }
+
+    private static Map<String,String> getTagsInFiles(files){
+
+        ArrayList ignoreTags = ['tree', 'ExportScenarios', 'IgnoreOnCIMainBuild']
+
+        Map<String,String> fileWithTags = new HashMap<String,String>();
+        Map<String,String> filesWithTags = new HashMap<String,String>();
+
+        for(int count = 0; count < files.size(); count++) {
+            
+            def file = files[count] 
+            String fileName = file.name.replaceFirst(~/\.[^\.]+$/, '') // убрал расширение
+            String text = getTextFromFile(file.path)
+            
+            ArrayList tags = new ArrayList()
+            def matcher = text =~ /@.+/
+            while(matcher.find()) {
+                String tag = text.substring(matcher.start() + 1, matcher.end())
+                if (!(tag in ignoreTags)){
+                    tags.add(tag)
+                }
+            }
+
+            fileWithTags.put(fileName, tags.join(','))
+        
+        }
+
+        for (tags in fileWithTags.values().unique()){
+            
+            ArrayList file = new ArrayList()
+            for(fileTags in fileWithTags) {
+                if (fileTags.value == tags){
+                    file.add(fileTags.key)
+                }
+            }
+
+            filesWithTags.put(file.join(','), tags);
+        
+        }
+
+        return filesWithTags
+
     }
 
 }
