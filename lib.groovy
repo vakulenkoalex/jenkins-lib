@@ -545,25 +545,24 @@ final class MainBuild{
 
                 for(filesTags in filesWithTags) {
 
-                    // todo придумать правило формирование имени чтобы было более читаемо
-
-                    String tag = filesTags.value
-                    String file = filesTags.key
-
+                    ArrayList tags = filesTags.value.split(',')
+                   
                     UnitTestType type = UnitTestType.THIN
-                    if (tag.contains(UnitTestType.THICK.m_name)){
+                    Integer index = tags.indexOf(UnitTestType.THICK.m_name)
+                    if (index != -1){
                         type = UnitTestType.THICK
+                        tags.remove(index)
                     }
-                    tag = deleteTag(tag, type.m_name)
-                    tag = tag.replace('Расширение', '')
-                    String name = 'Unit' + tag.replace(',', '')
+                    
+                    String extensions = tags.join(',').replace('Расширение', '')
+                    String name = 'Unit' + type.m_name + extensions
 
                     debug('UnitTest name = ' + name)
                     debug('UnitTest type = ' + type.m_name)
-                    debug('UnitTest tests = ' + file)
-                    debug('UnitTest extensions = ' + tag)
+                    debug('UnitTest tests = ' + filesTags.key)
+                    debug('UnitTest extensions = ' + extensions)
 
-                    s_tests.add(new UnitTest(name, '', type, file, tag))
+                    s_tests.add(new UnitTest(name, '', type, filesTags.key, extensions))
 
                 }
             
@@ -578,25 +577,24 @@ final class MainBuild{
 
                 for(filesTags in filesWithTags) {
 
-                    // todo придумать правило формирование имени чтобы было более читаемо
-
-                    String tag = filesTags.value
-                    String file = filesTags.key
-
+                    ArrayList tags = filesTags.value.split(',')
+                    
                     BehaveTestType type = BehaveTestType.THIN
-                    if (tag.contains(BehaveTestType.WEB.m_name)){
+                    Integer index = tags.indexOf(BehaveTestType.WEB.m_name)
+                    if (index != -1){
                         type = BehaveTestType.WEB
+                        tags.remove(index)
                     }
-                    tag = deleteTag(tag, type.m_name)
-                    tag = tag.replace('Расширение', '')
-                    String name = 'Behave' + tag.replace(',', '')
+
+                    String extensions = tags.join(',').replace('Расширение', '')
+                    String name = 'Behave' + type.m_name + extensions
 
                     debug('BehaveTest name = ' + name)
                     debug('BehaveTest type = ' + type.m_name)
-                    debug('BehaveTest features = ' + file)
-                    debug('BehaveTest extensions = ' + tag)
+                    debug('BehaveTest features = ' + filesTags.key)
+                    debug('BehaveTest extensions = ' + extensions)
 
-                    s_tests.add(new BehaveTest(name, '', type, file, tag))
+                    s_tests.add(new BehaveTest('Behave' + type.m_name + extensions, '', type, filesTags.key, extensions))
 
                 }
 
@@ -605,11 +603,6 @@ final class MainBuild{
             }
         }
         sortTestsByNode()
-    }
-
-    private static String deleteTag(String tags, String tag) {
-        tags = tags.replace(tag + ',', '')
-        return tags.replace(tag, '')
     }
 
     private static void getResult(){
@@ -1230,8 +1223,9 @@ class BehaveTest extends TestCase{
     private final String m_pathToApache
 
     BehaveTest(final String name, final String node, final BehaveTestType type, final String features, final String extensions = ''){
-
+        
         super(name, node)
+        
         m_type = type
         m_extensions = extensions
         m_features = features
