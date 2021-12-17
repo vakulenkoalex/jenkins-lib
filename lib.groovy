@@ -555,7 +555,7 @@ final class MainBuild{
                     }
                     
                     String extensions = tags.join(',').replace('Расширение', '')
-                    String name = 'Unit' + type.m_name + extensions
+                    String name = 'Unit' + type.m_name + extensions.replace(',', '')
 
                     debug('UnitTest name = ' + name)
                     debug('UnitTest type = ' + type.m_name)
@@ -587,7 +587,7 @@ final class MainBuild{
                     }
 
                     String extensions = tags.join(',').replace('Расширение', '')
-                    String name = 'Behave' + type.m_name + extensions
+                    String name = 'Behave' + type.m_name + extensions.replace(',', '')
 
                     debug('BehaveTest name = ' + name)
                     debug('BehaveTest type = ' + type.m_name)
