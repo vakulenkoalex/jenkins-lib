@@ -594,7 +594,7 @@ final class MainBuild{
                     debug('BehaveTest features = ' + filesTags.key)
                     debug('BehaveTest extensions = ' + extensions)
 
-                    s_tests.add(new BehaveTest('Behave' + type.m_name + extensions, '', type, filesTags.key, extensions))
+                    s_tests.add(new BehaveTest(name, '', type, filesTags.key, extensions))
 
                 }
 
