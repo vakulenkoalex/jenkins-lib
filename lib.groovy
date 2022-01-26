@@ -216,8 +216,6 @@ final class MainBuild{
             partOfText.add(String.format('--path "%1$s"', s_path1C))
         }
 
-        
-
         if (log != ''){
             partOfText.add(String.format('--log "%1$s"', log))
         }
@@ -918,7 +916,7 @@ class PlatformCheck extends TestCase{
         }
 
         partOfText.add(String.format('--skip_error "%1$s\\IgnoreErrors.txt" --skip_object "%1$s\\IgnoreObjects.txt"', m_pathToConfig))
-        MainBuild.run1C(partOfText.join(' '), MainBuild.baseFolder(), resultName, false)
+        MainBuild.run1C(partOfText.join(' '), MainBuild.baseFolder(), resultName)
 
         if (MainBuild.getTextFromFile(resultName) != '') {
             MainBuild.setUnstableResult(testName)
@@ -1182,12 +1180,19 @@ class UnitTest extends TestCase{
         partOfText.add('"%2$s\\xddTestRunner.epf"')
         partOfText.add('"--options"')
         partOfText.add('"xddRun ЗагрузчикКаталога %2$s\\%3$s;xddReport ГенераторОтчетаJUnitXML %2$s\\%4$s;xddShutdown;"')
+        
+        final String path1C = MainBuild.getPath1C()
+        if (path1C != ''){
+            partOfText.add('"--path"')
+            partOfText.add(String.format('"%1$s"', path1C))
+        }
 
         String textFile = String.format('[' + partOfText.join(',') + ']', MainBuild.baseFolder(), s_script.pwd(), 'build\\spec\\tests', resultName)
+        MainBuild.debug('textFile: ' + textFile)
 
         String fileName = 'xUnit.json'
         MainBuild.writeTextToFile(fileName, textFile.replace('\\', '\\\\'))
-        MainBuild.run1C('file --params ' + fileName)
+        MainBuild.run1C('file --params ' + fileName, '', '', true)
 
         s_script.junit(resultName)
 
