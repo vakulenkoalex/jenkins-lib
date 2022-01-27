@@ -976,7 +976,7 @@ class CodeAnalysis extends TestCase{
 
         final String path1C = MainBuild.getPath1C()
         if (path1C != ''){
-            parameterEpf.add('Path=' + path1C)
+            parameterEpf.add('Path=' + path1C + '\\bin')
         }
         if ((MainBuild.getUseChangeObjects()) && (MainBuild.s_script.fileExists(MainBuild.fileChangeObject()))) {
             if (getFileChangeObjectForCodeAnalysis(MainBuild.fileChangeObject())){
