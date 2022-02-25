@@ -1332,9 +1332,8 @@ class BehaveTest extends TestCase{
 
     protected void commandAfterTest(){
 
-        MainBuild.startBat('taskkill /IM 1cv8c.exe || exit 0')
-        MainBuild.startBat('taskkill /IM 1cv8.exe || exit 0')
-
+        MainBuild.startBat('taskkill /IM 1cv8c.exe /F || exit 0')
+        
         if (m_type==BehaveTestType.WEB){
 
             MainBuild.startBat('taskkill /IM chrome.exe /F || exit 0')
