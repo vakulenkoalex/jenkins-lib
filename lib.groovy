@@ -1160,7 +1160,7 @@ class UnitTest extends TestCase{
         
         if (m_extensions != ''){
             MainBuild.unstashResource(m_stashNameForExt)
-            MainBuild.run1C(String.format('add_extensions --folder %1$s\\%2$s', workPath, 'spec\\ext'),
+            MainBuild.run1C(String.format('load_extension --agent --update --folder %1$s\\%2$s', workPath, 'spec\\ext'),
                             MainBuild.baseFolder())
         }
 
@@ -1287,7 +1287,7 @@ class BehaveTest extends TestCase{
 
         if (m_extensions != ''){
             MainBuild.unstashResource(m_stashNameForExt)
-            MainBuild.run1C(String.format('add_extensions --folder %1$s\\%2$s', workPath, 'spec\\ext'),
+            MainBuild.run1C(String.format('load_extension --agent --update --folder %1$s\\%2$s', workPath, 'spec\\ext'),
                             MainBuild.baseFolder())
         }
 
