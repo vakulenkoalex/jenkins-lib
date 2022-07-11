@@ -1,2 +1,2 @@
 chcp 65001
-java -Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8 -jar agent.jar -jnlpUrl http://srv-jen:8080/computer/work_3/slave-agent.jnlp -secret 199a00192420a3e0365197291fd3dc215c69f2e0f5dee5312fe849fb06a0d468
+java -Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8 -jar agent.jar -jnlpUrl http://****/computer/work_3/slave-agent.jnlp -secret ****
