@@ -1,1 +1,2 @@
 JAVA_ARGS="\"-Dhudson.model.DirectoryBrowserSupport.CSP=default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';\" \"-Djenkins.model.DirectoryBrowserSupport.CSP=default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';\""
+JAVA_ARGS="-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8"
