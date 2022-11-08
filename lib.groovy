@@ -124,7 +124,7 @@ final class MainBuild{
                 s_script.stage('RunTests') {
                     s_libScript.runTests(s_tests)
                 }
-                s_script.node('master') {
+                s_script.node('built-in') {
                     s_script.stage('GetResult') {
                         getResult()
                     }
@@ -510,7 +510,7 @@ final class MainBuild{
 
     private static void archiveArtifacts(final String stashName){
         if ((s_artifactsPath != '') && (s_script.currentBuild.result == "SUCCESS")) {
-            s_script.node('master') {
+            s_script.node('built-in') {
 
                 unstashResource(stashName)
                 s_script.archiveArtifacts(artifacts: getArtifactsPath(), fingerprint: true, onlyIfSuccessful: true)
