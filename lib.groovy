@@ -401,8 +401,8 @@ final class MainBuild{
 
             }else{
                 s_script.git(branch: s_branch, 
-                             credentialsId: '018f9d07-8f7c-41c5-9fb9-e041b1ee72b0',
-                             url: String.format('https://%1$s@bitbucket.org/%2$s.git', 'VakulenkoAleksei', s_repo))
+                             credentialsId: '87e46017-dc29-49da-b21b-30f47184962d',
+                             url: String.format('https://bitbucket.org/%1$s.git', s_repo))
             }
 
         }
