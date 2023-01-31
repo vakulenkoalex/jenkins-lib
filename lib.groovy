@@ -54,10 +54,6 @@ def sendMsg(StartBuild){
     MainBuild.sendMsg(StartBuild)
 }
 
-def echoColourText(text, color){
-    MainBuild.echoColourText(text, color)
-}
-
 def setResultAfterError(exception){
     MainBuild.setResultAfterError(exception)
 }
