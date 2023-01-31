@@ -50,6 +50,18 @@ def useChangeObjects(){
     MainBuild.s_useChangeObjects = true
 }
 
+def sendMsg(StartBuild){
+    MainBuild.sendMsg(StartBuild)
+}
+
+def echoColourText(text, color){
+    MainBuild.echoColourText(text, color)
+}
+
+def setResultAfterError(exception){
+    MainBuild.setResultAfterError(exception)
+}
+
 // ядро
 
 final class MainBuild{
@@ -267,8 +279,8 @@ final class MainBuild{
 
     static void setResultAfterError(final exception){
 
-        showError(exception)
         s_script.currentBuild.result = "FAILURE"
+        showError(exception)
 
     }
 
@@ -463,7 +475,7 @@ final class MainBuild{
 
     }
 
-    private static void sendMsg(final boolean StartBuild){
+    static void sendMsg(final boolean StartBuild){
 
         if (s_sendMsg) {
 
