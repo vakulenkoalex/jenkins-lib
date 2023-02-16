@@ -956,7 +956,7 @@ class CodeAnalysis extends TestCase{
             s_script.copyArtifacts(filter: 'base/1Cv8.1CD', fingerprintArtifacts: true, flatten: true, projectName: 'VakulenkoAleksei/acc/master/', target: s_baseAcc)
             s_script.copyArtifacts(filter: 'build/lib/epf/SyntaxCheckAcc.epf', fingerprintArtifacts: true, flatten: true, projectName: 'VakulenkoAleksei/acc/master/')
             
-            final String resource = String.format('%1$s/*, %2$s/1Cv8.1CD, SyntaxCheckAcc.epf', s_pathToConfig, s_baseAcc)
+            final String resource = String.format('%1$s/*, %2$s/1Cv8.1CD, SyntaxCheckAcc.epf, cf/**', s_pathToConfig, s_baseAcc)
             MainBuild.stashResource(s_stashName, resource)
 
         }
@@ -974,17 +974,18 @@ class CodeAnalysis extends TestCase{
         final String logName = "Log" + testName
         final String logFileName = logName + ".html"
         
-        MainBuild.run1C('reg_server')
-
         ArrayList parameterEpf = new ArrayList()
+        parameterEpf.add('Prefix=sph')
         parameterEpf.add('Base=%CD%\\' + MainBuild.baseFolder())
         parameterEpf.add(String.format('Specificity=%1$s\\Specificity.txt', s_pathToConfig))
         parameterEpf.add('Result=' + resultCode)
         parameterEpf.add('ReportHtml=' + resultName)
-
+        parameterEpf.add(String.format('IgnoreErrors=%1$s\\IgnoreErrors.txt', s_pathToConfig))
+        parameterEpf.add(String.format('Sources=%1$s', 'cf'))
+        
         final String path1C = MainBuild.getPath1C()
         if (path1C != ''){
-            parameterEpf.add('Path=' + path1C + '\\bin')
+            parameterEpf.add('Path=' + path1C)
         }
         if ((MainBuild.getUseChangeObjects()) && (MainBuild.s_script.fileExists(MainBuild.fileChangeObject()))) {
             if (getFileChangeObjectForCodeAnalysis(MainBuild.fileChangeObject())){
@@ -996,8 +997,6 @@ class CodeAnalysis extends TestCase{
             parameterEpf.add('IgnoreObjects=' + fileNameIgnoreObject)
         }
 
-        parameterEpf.add(String.format('IgnoreErrors=%1$s\\IgnoreErrors.txt', s_pathToConfig))
-        
         MainBuild.run1C(String.format('start %1$s "%2$s"', s_command, parameterEpf.join(';')), s_baseAcc, logFileName, true)
         MainBuild.publishResultHTML(logName, logFileName)
 
