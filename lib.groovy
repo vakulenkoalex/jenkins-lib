@@ -504,6 +504,17 @@ final class MainBuild{
             message.add(String.format('(<%1$s|%2$s>)', s_script.env.BUILD_URL, 'Open'))
             
             try{
+                s_script.withCredentials([s_script.string(credentialsId: 'token', variable: 'TOKEN'), s_script.string(credentialsId: 'chat', variable: 'CHAT')]) {
+                    def message_string = escapeStringForMarkdownV2(message.join(' ')) 
+                    def body = String.format('{"chat_id": "%1$s", "text": "%2$s", "disable_web_page_preview": true, "parse_mode": "MarkdownV2"}', s_script.env.CHAT, message_string)
+                    def telegram_url = String.format('https://api.telegram.org/bot%1$s/sendMessage', s_script.env.TOKEN)
+                    s_script.httpRequest(consoleLogResponseBody: true, contentType: 'APPLICATION_JSON_UTF8', httpMode: 'POST', requestBody: body, url: telegram_url)
+                }
+            }catch (exception){
+                showError(exception)
+            }
+
+            try{
                 s_script.timeout(time: 15, unit: 'SECONDS') {
                     s_script.slackSend color: color, failOnError: true, message: message.join(' ')
                 }
@@ -738,6 +749,28 @@ final class MainBuild{
         return filesWithTags
 
     }
+
+    private static String  escapeStringForMarkdownV2(String incoming) {
+        return incoming.replace('_', '\\\\_')
+                        .replace('*', '\\\\*')
+                        .replace('[', '\\\\[')
+                        .replace(']', '\\\\]')
+                        .replace('(', '\\\\(')
+                        .replace(')', '\\\\)')
+                        .replace('~', '\\\\~')
+                        .replace('`', '\\\\`')
+                        .replace('>', '\\\\>')
+                        .replace('#', '\\\\#')
+                        .replace('+', '\\\\+')
+                        .replace('-', '\\\\-')
+                        .replace('=', '\\\\=')
+                        .replace('|', '\\\\|')
+                        .replace('{', '\\\\{')
+                        .replace('}', '\\\\}')
+                        .replace('.', '\\\\.')
+                        .replace('!', '\\\\!')
+    }
+ 
 
 }
 
