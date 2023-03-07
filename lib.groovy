@@ -476,12 +476,14 @@ final class MainBuild{
         if (s_sendMsg) {
 
             String color
+            String picture
             ArrayList message = new ArrayList()
             message.add(String.format('%1$s - #%2$s', s_script.env.JOB_NAME.replace('%2F', '/'), s_script.env.BUILD_NUMBER))
             String grey = '#948f8f'
 
             if (StartBuild){
                 color = grey
+                picture = ''
                 message.add('Started')
             }else{
                 String result = s_script.currentBuild.result.substring(0,1) + s_script.currentBuild.result.substring(1).toLowerCase()
@@ -489,12 +491,19 @@ final class MainBuild{
                 switch(s_script.currentBuild.result) {
                     case "SUCCESS":
                         color = 'good'
+                        picture = "✅"
                         break
                     case "FAILURE":
                         color = 'danger'
+                        picture = "❌"
+                        break
+                    case "ABORTED":
+                        color = 'danger'
+                        picture = "🛑"
                         break
                     case "UNSTABLE":
                         color = 'warning'
+                        picture = "💩"
                         break
                     default:
                         color = grey
@@ -505,10 +514,10 @@ final class MainBuild{
             
             try{
                 s_script.withCredentials([s_script.string(credentialsId: 'token', variable: 'TOKEN'), s_script.string(credentialsId: 'chat', variable: 'CHAT')]) {
-                    def message_string = escapeStringForMarkdownV2(message.join(' ')) 
+                    def message_string = picture + escapeStringForMarkdownV2(message.join(' ')) 
                     def body = String.format('{"chat_id": "%1$s", "text": "%2$s", "disable_web_page_preview": true, "parse_mode": "MarkdownV2"}', s_script.env.CHAT, message_string)
                     def telegram_url = String.format('https://api.telegram.org/bot%1$s/sendMessage', s_script.env.TOKEN)
-                    s_script.httpRequest(consoleLogResponseBody: true, contentType: 'APPLICATION_JSON_UTF8', httpMode: 'POST', requestBody: body, url: telegram_url)
+                    s_script.httpRequest(consoleLogResponseBody: s_debug, contentType: 'APPLICATION_JSON_UTF8', httpMode: 'POST', requestBody: body, url: telegram_url)
                 }
             }catch (exception){
                 showError(exception)
