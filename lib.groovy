@@ -922,32 +922,38 @@ class PlatformCheck extends TestCase{
         final String testName = getName()
         final String resultName = testName + ".html"
 
-        ArrayList partOfText = new ArrayList()
-        partOfText.add('platform_check --options')
-
+        ArrayList partOfOption = new ArrayList()
         if (m_extendedModulesCheck) {
             
-            // не убирать пробел в начале иначе не работает запуск в python
-
-            if (MainBuild.getRunModeOrdinaryApplication()) {
-                partOfText.add('" -ExtendedModulesCheck"')
-            } else {
-                partOfText.add('" -ExtendedModulesCheck -CheckUseModality"')
-                partOfText.add(String.format('--skip_modality "%1$s\\SkipModality.txt"', m_pathToConfig))
+            partOfOption.add('ExtendedModulesCheck')
+            if (!MainBuild.getRunModeOrdinaryApplication()) {
+                partOfOption.add('CheckUseModality')
             }
 
         } else {
             
-            partOfText.add('" -ConfigLogIntegrity -IncorrectReferences -ThinClient -Server')
-                        
-             if (!MainBuild.getRunModeOrdinaryApplication()) {
-                partOfText.add('-WebClient')
+            partOfOption.add('ConfigLogIntegrity')
+            partOfOption.add('IncorrectReferences')
+            partOfOption.add('ThinClient')
+            partOfOption.add('Server')
+            if (!MainBuild.getRunModeOrdinaryApplication()) {
+                partOfOption.add('WebClient')
             }
-
-            partOfText.add('-ExternalConnection -ExternalConnectionServer -ThickClientOrdinaryApplication')
-            partOfText.add('-ThickClientServerOrdinaryApplication -UnreferenceProcedures -HandlersExistence')
-            partOfText.add('-EmptyHandlers"')
+            partOfOption.add('ExternalConnection')
+            partOfOption.add('ExternalConnectionServer')
+            partOfOption.add('ThickClientOrdinaryApplication')
+            partOfOption.add('ThickClientServerOrdinaryApplication')
+            partOfOption.add('UnreferenceProcedures')
+            partOfOption.add('HandlersExistence')
+            partOfOption.add('EmptyHandlers')
             
+        }
+        
+        ArrayList partOfText = new ArrayList()
+        partOfText.add(String.format('platform_check --option "%1$s"', partOfOption.join(' ')))
+
+        if (m_extendedModulesCheck && !MainBuild.getRunModeOrdinaryApplication()) {
+            partOfText.add(String.format('--skip_modality "%1$s\\SkipModality.txt"', m_pathToConfig))
         }
 
         partOfText.add(String.format('--skip_error "%1$s\\IgnoreErrors.txt" --skip_object "%1$s\\IgnoreObjects.txt"', m_pathToConfig))
