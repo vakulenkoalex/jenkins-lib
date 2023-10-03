@@ -92,6 +92,7 @@ final class MainBuild{
         }
 
         final String stashName = 'artifacts'
+        Boolean NeedCreateBase = false
         sendMsg(true)
 
         TestCase.s_script = s_script
@@ -109,8 +110,16 @@ final class MainBuild{
                     if (s_scanTask) {
                         getTask()
                     }
-                    createBase()
+                    
                     getTestFromName()
+                    for(TestCase object: s_tests) {
+                        if (object.needCreateBase()){
+                            NeedCreateBase = true
+                        }
+                    }
+                    if (NeedCreateBase){
+                        createBase()
+                    }
                     getResourcesForTest()
 
                     if (s_artifactsPath != '') {
@@ -891,6 +900,10 @@ abstract class TestCase implements Serializable{
         MainBuild.debug(m_name + '_getResources')
     }
 
+    Boolean needCreateBase(){
+        return true
+    }
+
     protected void commandForRunTest(){
         MainBuild.debug(m_name + '_commandForRunTest')
     }
@@ -1416,6 +1429,10 @@ class SonarQube extends TestCase{
 
     void getResources(){
         MainBuild.stashResource(getName(), 'sonar-project.properties, **/*.bsl')
+    }
+
+    Boolean needCreateBase(){
+        return false
     }
 
     protected void commandForRunTest(){
