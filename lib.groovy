@@ -1440,7 +1440,7 @@ class SonarQube extends TestCase{
         MainBuild.unstashResource(getName())
 
         def scannerHome = s_script.tool(name: 'sonar', type: 'hudson.plugins.sonar.SonarRunnerInstallation');
-        s_script.withSonarQubeEnv(installationName: 'sonar') {
+        s_script.withSonarQubeEnv() {
             MainBuild.s_sonar_host_url = s_script.env.SONAR_HOST_URL
             ArrayList sonarcommand = new ArrayList()
             sonarcommand.add(String.format('%1$s/bin/sonar-scanner', scannerHome))
