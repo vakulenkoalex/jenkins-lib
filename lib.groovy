@@ -33,9 +33,7 @@ def setPath1C(final path1C){
 }
 
 def setDebugMode(){
-    MainBuild.s_debug = true
-    MainBuild.s_sendMsg = false
-    disableScanTask()
+    MainBuild.setDebugMode()
 }
 
 def disableScanTask(){
@@ -88,6 +86,10 @@ final class MainBuild{
     }
 
     static void startBuild(){
+        
+        if (s_script.env.DebugMode == 'true'){
+            setDebugMode()
+        }
 
         final String stashName = 'artifacts'
         sendMsg(true)
@@ -766,6 +768,11 @@ final class MainBuild{
                         .replace('!', '\\\\!')
     }
  
+    static void setDebugMode(){
+        s_debug = true
+        s_sendMsg = false
+        s_scanTask = false
+    }
 
 }
 
