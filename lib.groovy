@@ -658,7 +658,7 @@ final class MainBuild{
             String link = String.format('<a href="%1$s/dashboard?id=%2$s&branch=%3$s">SonarQube</a>', s_sonar_host_url, MainBuild.getRepo(), MainBuild.getBranch())
             MainBuild.debug('SonarQube = ' + link)
             
-            def summary = s_script.createSummary(icon: "/static/8361d0d6/images/16x16/terminal.png")
+            def summary = s_script.createSummary(icon: "/static/d3b8701d/plugin/sonar/images/waves_16x16.png")
             summary.appendText(link)
 
             if (s_script.env.waitForSonar == 'true'){
