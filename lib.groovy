@@ -139,7 +139,8 @@ final class MainBuild{
                 }
 
             }
-
+        } catch (exception) {
+            setResultAfterError(exception)
         } finally {
             archiveArtifacts(stashName)
             sendMsg(false)
