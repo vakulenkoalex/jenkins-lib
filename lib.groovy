@@ -56,6 +56,10 @@ def setResultAfterError(exception){
     MainBuild.setResultAfterError(exception)
 }
 
+def setNeedCreateBase(){
+    MainBuild.s_NeedCreateBase = true
+}
+
 // ядро
 
 final class MainBuild{
@@ -75,6 +79,7 @@ final class MainBuild{
     public static Boolean s_runModeOrdinaryApplication = false
     public static Boolean s_scanTask = true
     public static Boolean s_useChangeObjects = false
+    public static Boolean s_NeedCreateBase = false
     private static String s_baseFolder = 'base'
     private static String s_fileСhangeObject = 'Object.txt'
     private static ArrayList s_tests = new ArrayList()
@@ -92,7 +97,6 @@ final class MainBuild{
         }
 
         final String stashName = 'artifacts'
-        Boolean NeedCreateBase = false
         sendMsg(true)
 
         TestCase.s_script = s_script
@@ -114,10 +118,10 @@ final class MainBuild{
                     getTestFromName()
                     for(TestCase object: s_tests) {
                         if (object.needCreateBase()){
-                            NeedCreateBase = true
+                            s_NeedCreateBase = true
                         }
                     }
-                    if (NeedCreateBase){
+                    if (s_NeedCreateBase){
                         createBase()
                     }
                     getResourcesForTest()
