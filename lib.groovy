@@ -18,10 +18,12 @@ def setNode(final String node){
     MainBuild.s_node = node
 }
 
-def setPathToSource(final repo, final branch){
+def setPathToSource(final repoUrl, final repo, final branch, final credentialsid){
     MainBuild.s_repo = repo
     MainBuild.s_branch = branch
     MainBuild.s_multibranch = false
+    MainBuild.s_credentialsid = credentialsid
+    MainBuild.s_repoUrl = repoUrl
 }
 
 def setRunModeOrdinaryApplication(){
@@ -73,6 +75,8 @@ final class MainBuild{
     public static String s_artifactsPath = ''
     public static String s_repo_from_scm = ''
     public static String s_sonar_host_url = ''
+    public static String s_credentialsid = ''
+    public static String s_repoUrl = ''
     public static Boolean s_multibranch = true
     public static Boolean s_debug = false
     public static Boolean s_sendMsg = true
@@ -425,8 +429,8 @@ final class MainBuild{
 
             }else{
                 s_script.git(branch: s_branch, 
-                             credentialsId: '87e46017-dc29-49da-b21b-30f47184962d',
-                             url: String.format('https://bitbucket.org/%1$s.git', s_repo))
+                             credentialsId: s_credentialsid,
+                             url: s_repoUrl)
             }
 
         }
