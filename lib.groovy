@@ -127,6 +127,8 @@ final class MainBuild{
                     }
                     if (s_NeedCreateBase){
                         createBase()
+                    }else{
+                        debug('skip create base')    
                     }
                     getResourcesForTest()
 
@@ -570,6 +572,9 @@ final class MainBuild{
     private static void getTestFromName() {
 
         for(object in s_testName) {
+            debug('Test name: ' + object.name)
+            debug('Test node: ' + object.node)
+            
             if (object.name == 'UnitTest') {
                 
                 Map<String,String> filesWithTags = getTagsInFiles(s_script.findFiles(glob: 'spec/tests/**/*.bsl'))
@@ -633,6 +638,7 @@ final class MainBuild{
                 s_tests.add(new SonarQube(object.name, object.node))
             }
         }
+        debug('s_tests size: ' + s_tests.size())
         sortTestsByNode()
     }
 
