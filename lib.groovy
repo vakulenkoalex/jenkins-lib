@@ -1001,12 +1001,11 @@ class PlatformCheck extends TestCase{
 
 class CodeAnalysis extends TestCase{
 
-    static final String s_command = '--thick --epf SyntaxCheckAcc.epf --options'
-    static final String s_baseAcc = 'base_acc'
-    static final String s_stashName = 'CodeAnalysis'
-    static final String s_pathToConfig = 'spec\\syntax\\acc'
+    private final String s_command = '--thick --epf SyntaxCheckAcc.epf --options'
+    private final String s_baseAcc = 'base_acc'
+    private final String s_stashName = 'CodeAnalysis'
+    private final String s_pathToConfig = 'spec\\syntax\\acc'
     static final String s_changeObjects = "objects_acc.txt"
-    static final String s_repoAcc = 'Bitbucket VakulenkoAleksei/acc/master/'
 
     CodeAnalysis(final String name, final String node){
         super(name, node)
@@ -1016,8 +1015,8 @@ class CodeAnalysis extends TestCase{
 
         if (!MainBuild.resourceExist(s_stashName)) {
 
-            s_script.copyArtifacts(filter: 'base/1Cv8.1CD', fingerprintArtifacts: true, flatten: true, projectName: s_repoAcc, target: s_baseAcc)
-            s_script.copyArtifacts(filter: 'build/lib/epf/SyntaxCheckAcc.epf', fingerprintArtifacts: true, flatten: true, projectName: s_repoAcc)
+            s_script.copyArtifacts(filter: 'base/1Cv8.1CD', fingerprintArtifacts: true, flatten: true, projectName: s_script.env.repoAcc, target: s_baseAcc)
+            s_script.copyArtifacts(filter: 'build/lib/epf/SyntaxCheckAcc.epf', fingerprintArtifacts: true, flatten: true, projectName: s_script.env.repoAcc)
             
             final String resource = String.format('%1$s/*, %2$s/1Cv8.1CD, SyntaxCheckAcc.epf, cf/**', s_pathToConfig, s_baseAcc)
             MainBuild.stashResource(s_stashName, resource)
@@ -1198,7 +1197,7 @@ class UnitTest extends TestCase{
     void getResources(){
         
         if (!MainBuild.resourceExist(getClassName())) {
-            s_script.copyArtifacts(fingerprintArtifacts: true, projectName: 'add')
+            s_script.copyArtifacts(fingerprintArtifacts: true, projectName: s_script.env.repoAdd)
             MainBuild.stashResource(getClassName(), 'xddTestRunner.epf, plugins\\*.epf')
         }
 
@@ -1234,7 +1233,7 @@ class UnitTest extends TestCase{
                             MainBuild.baseFolder())
         }
 
-        s_script.copyArtifacts(filter: 'xddTestRunner.epf, plugins\\*.epf', fingerprintArtifacts: true, projectName: 'add')
+        s_script.copyArtifacts(filter: 'xddTestRunner.epf, plugins\\*.epf', fingerprintArtifacts: true, projectName: s_script.env.repoAdd)
         final String resultName = getName().toLowerCase() + ".xml"
 
         ArrayList partOfText = new ArrayList()
@@ -1321,7 +1320,7 @@ class BehaveTest extends TestCase{
     void getResources(){
 
         if (!MainBuild.resourceExist(getClassName())) {
-            s_script.copyArtifacts(fingerprintArtifacts: true, projectName: 'add')
+            s_script.copyArtifacts(fingerprintArtifacts: true, projectName: s_script.env.repoAdd)
             MainBuild.stashResource(getClassName(), 'bddRunner.epf, lib/featurereader/vbFeatureReader.epf, features/libraries/**, locales/**, plugins/**, vendor/**')
         }
 
