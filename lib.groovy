@@ -601,7 +601,7 @@ final class MainBuild{
                     s_tests.add(new UnitTest(name, '', type, filesTags.key, extensions))
 
                 }
-            
+
             }else if (object.name == 'PlatformCheck') {
                 s_tests.add(new PlatformCheck(object.name + 'Extended', object.node, true))
                 s_tests.add(new PlatformCheck(object.name + 'Simple', '', false))
@@ -609,7 +609,7 @@ final class MainBuild{
                 s_tests.add(new CodeAnalysis(object.name, object.node))
             }else if (object.name == 'BehaveTest') {
 
-                Map<String,String> filesWithTags = getTagsInFiles(s_script.findFiles(glob: 'build/spec/features/*.feature'))
+                Map<String,String> filesWithTags = getTagsInFiles(s_script.findFiles(glob: 'spec/features/*.data'))
 
                 for(filesTags in filesWithTags) {
 
@@ -624,13 +624,15 @@ final class MainBuild{
 
                     String extensions = tags.join(',').replace('Расширение', '')
                     String name = 'Behave' + type.m_name + extensions.replace(',', '')
+                    String fileName = filesTags.key.replace('.data', '.feature')
+                    fileName = fileName.replace('spec/', 'build/spec/')
 
                     debug('BehaveTest name = ' + name)
                     debug('BehaveTest type = ' + type.m_name)
-                    debug('BehaveTest features = ' + filesTags.key)
+                    debug('BehaveTest features = ' + fileName)
                     debug('BehaveTest extensions = ' + extensions)
 
-                    s_tests.add(new BehaveTest(name, '', type, filesTags.key, extensions))
+                    s_tests.add(new BehaveTest(name, '', type, fileName, extensions))
 
                 }
 
