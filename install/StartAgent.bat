@@ -1,2 +1,2 @@
-chcp 65001
-java -Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8 -jar agent.jar -jnlpUrl http://****/computer/work_3/slave-agent.jnlp -secret ****
+chcp 65001 
+java -jar agent.jar -jnlpUrl http://srv-jen2.gcfs.lan:8080/computer/work_3/jenkins-agent.jnlp -secret @secret.txt
