@@ -625,7 +625,7 @@ final class MainBuild{
                     String extensions = tags.join(',').replace('Расширение', '')
                     String name = 'Behave' + type.m_name + extensions.replace(',', '')
                     String fileName = filesTags.key.replace('.data', '.feature')
-                    fileName = fileName.replace('spec/', 'build/spec/')
+                    fileName = fileName.replace('spec\\', 'build\\spec\\')
 
                     debug('BehaveTest name = ' + name)
                     debug('BehaveTest type = ' + type.m_name)
