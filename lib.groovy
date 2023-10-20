@@ -638,7 +638,11 @@ final class MainBuild{
                 s_tests.add(new SonarQube(object.name, object.node))
             }
         }
+        
         debug('s_tests size: ' + s_tests.size())
+        if (s_tests.size() == 0){
+            s_script.error('not find TestCase by name')
+        }
         sortTestsByNode()
     }
 
