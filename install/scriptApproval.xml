@@ -1,25 +1,9 @@
 <?xml version='1.1' encoding='UTF-8'?>
-<scriptApproval plugin="script-security@1.78">
+<scriptApproval plugin="script-security@1275.v23895f409fb_d">
   <approvedScriptHashes/>
   <approvedSignatures>
-    <string>method groovy.lang.GroovyObject getProperty java.lang.String</string>
-    <string>method groovy.lang.GroovyObject invokeMethod java.lang.String java.lang.Object</string>
-    <string>method groovy.lang.GroovyObject setProperty java.lang.String java.lang.Object</string>
-    <string>method java.util.Collection remove java.lang.Object</string>
-    <string>method java.util.regex.MatchResult end</string>
-    <string>method java.util.regex.MatchResult start</string>
-    <string>method java.util.regex.Matcher find</string>
     <string>new java.util.ArrayList</string>
-    <string>new java.util.HashMap</string>
-    <string>staticField Folders SYNTAX_ACC</string>
-    <string>staticField Folders m_path</string>
-    <string>staticField java.io.File separator</string>
-    <string>staticMethod BehaveTestType $INIT java.lang.Object[]</string>
-    <string>staticMethod CodeAnalysisType $INIT java.lang.Object[]</string>
-    <string>staticMethod java.lang.System lineSeparator</string>
-    <string>staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods getAt java.lang.Iterable int</string>
     <string>staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods invokeMethod java.lang.Object java.lang.String java.lang.Object</string>
-    <string>staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods replaceFirst java.lang.String java.util.regex.Pattern java.lang.String</string>
   </approvedSignatures>
   <aclApprovedSignatures/>
   <approvedClasspathEntries/>
