@@ -642,7 +642,7 @@ final class MainBuild{
         }
         
         debug('s_tests size: ' + s_tests.size())
-        if (s_tests.size() == 0){
+        if (s_testName.size() > 0 && s_tests.size() == 0){
             s_script.error('not find TestCase by name')
         }
         sortTestsByNode()
