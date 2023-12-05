@@ -638,6 +638,8 @@ final class MainBuild{
 
             }else if (object.name == 'SonarQube') {
                 s_tests.add(new SonarQube(object.name, object.node))
+            }else if (object.name == 'YAxunit') {
+                s_tests.add(new YAxunit(object.name, object.node))
             }
         }
         
@@ -1467,6 +1469,60 @@ class SonarQube extends TestCase{
             sonarcommand.add(String.format('-Dsonar.branch.name=%1$s -Dsonar.projectKey=%2$s', MainBuild.getBranch(), MainBuild.getRepo()))
             MainBuild.startBat(sonarcommand.join(' '))
         }
+
+    }
+
+}
+
+class YAxunit extends TestCase{
+
+    private final String m_stashNameForTest
+
+    YAxunit(final String name, final String node){
+        super(name, node)
+        m_stashNameForTest = name + 'Ext'
+    }
+
+    void getResources(){
+        
+        if (!MainBuild.resourceExist(getClassName())) {
+            s_script.copyArtifacts(fingerprintArtifacts: true, projectName: s_script.env.repoYAxunit)
+            MainBuild.stashResource(getClassName(), 'jenkins\\**')
+        }
+
+        MainBuild.stashResource(m_stashNameForTest, 'spec\\yaxunit\\**')
+
+    }
+
+    protected void commandForRunTest(){
+
+        MainBuild.unstashResource(MainBuild.baseFolder())
+        MainBuild.unstashResource(getClassName())
+        MainBuild.unstashResource(m_stashNameForTest)
+
+        final String workPath = s_script.pwd()
+        final String resultName = getName().toLowerCase() + ".xml"
+        final String configTest = "YAxunit.json"
+
+        MainBuild.run1C(String.format('load_extension --agent --update --folder %1$s\\%2$s', workPath, 'jenkins'),
+                        MainBuild.baseFolder())
+        MainBuild.run1C(String.format('load_extension --agent --update --folder %1$s\\%2$s', workPath, 'spec\\yaxunit'),
+                        MainBuild.baseFolder())
+
+        ArrayList partOfConfig = new ArrayList()
+        partOfConfig.add(String.format('"reportPath": "%1$s"', resultName))
+        partOfConfig.add('"reportFormat": "jUnit"')
+        partOfConfig.add('"closeAfterTests": true')
+        MainBuild.writeTextToFile(configTest, "{" + partOfConfig.join(',') + "}")
+
+        ArrayList partOfCommand = new ArrayList()
+        partOfCommand.add('start')
+        partOfCommand.add('--options')
+        partOfCommand.add(String.format('"RunUnitTests=%1$s"', configTest))
+        
+        MainBuild.run1C(partOfCommand.join(' '), MainBuild.baseFolder())
+
+        s_script.junit(resultName)
 
     }
 
