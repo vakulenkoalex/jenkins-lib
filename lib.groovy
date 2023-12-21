@@ -1049,31 +1049,34 @@ class CodeAnalysis extends TestCase{
         final String resultCode = testName + ".txt"
         final String logName = "Log" + testName
         final String logFileName = logName + ".html"
+        final String fileNameConfig = 'acc.json'
         
-        ArrayList parameterEpf = new ArrayList()
-        parameterEpf.add('Prefix=sph')
-        parameterEpf.add('Base=%CD%\\' + MainBuild.baseFolder())
-        parameterEpf.add(String.format('Specificity=%1$s\\Specificity.txt', s_pathToConfig))
-        parameterEpf.add('Result=' + resultCode)
-        parameterEpf.add('ReportHtml=' + resultName)
-        parameterEpf.add(String.format('IgnoreErrors=%1$s\\IgnoreErrors.txt', s_pathToConfig))
-        parameterEpf.add(String.format('Sources=%1$s', 'cf'))
-        
+        def parameterEpf = [:]
+        parameterEpf['Prefix'] = 'sph,фм'
+        parameterEpf['Base'] = MainBuild.baseFolder()
+        parameterEpf['Specificity'] = String.format('%1$s\\Specificity.txt', s_pathToConfig)
+        parameterEpf['Result'] = resultCode
+        parameterEpf['ReportHtml'] = resultName
+        parameterEpf['IgnoreErrors'] = String.format('%1$s\\IgnoreErrors.txt', s_pathToConfig)
+        parameterEpf['Sources'] = 'cf'
+               
         final String path1C = MainBuild.getPath1C()
         if (path1C != ''){
-            parameterEpf.add('Path=' + path1C)
+            parameterEpf['Path'] = path1C
         }
         if ((MainBuild.getUseChangeObjects()) && (MainBuild.s_script.fileExists(MainBuild.fileChangeObject()))) {
             if (getFileChangeObjectForCodeAnalysis(MainBuild.fileChangeObject())){
-                parameterEpf.add('Objects=' + s_changeObjects)
+                parameterEpf['Objects'] = s_changeObjects
             }
         }
         final String fileNameIgnoreObject = s_pathToConfig + '\\IgnoreObjects.txt'
         if (MainBuild.s_script.fileExists(fileNameIgnoreObject)) {
-            parameterEpf.add('IgnoreObjects=' + fileNameIgnoreObject)
+            parameterEpf['IgnoreObjects'] = fileNameIgnoreObject
         }
 
-        MainBuild.run1C(String.format('start %1$s "%2$s"', s_command, parameterEpf.join(';')), s_baseAcc, logFileName, true)
+        s_script.writeJSON(file: fileNameConfig, json: parameterEpf)
+
+        MainBuild.run1C(String.format('start %1$s "%2$s"', s_command, 'ConfigFile=' + fileNameConfig), s_baseAcc, logFileName, true)
         MainBuild.publishResultHTML(logName, logFileName)
 
         Boolean publishResult = false
