@@ -14,14 +14,32 @@ def echoColourText(text, color){
 
 def get_hash_files(repo){
     result = [:]
+    ignore = '// РазрешеноРасхождение\r\n'
+    
     dir(repo) {
-        git(branch: 'feature/common_object', credentialsId: '87e46017-dc29-49da-b21b-30f47184962d', url: String.format('https://bitbucket.org/pharmsklad/%1$s.git', repo))
         text = readFile('spec/syntax/CommonObject.txt')
         files = text.split(System.lineSeparator())
         files.each{value->
             newValue = value.trim()
             if (fileExists(newValue)) {
-                result.put(newValue, sha256(newValue))
+                text = readFile(file: newValue)
+                
+                array = text.split(ignore)
+                new_text = ''
+                add = true
+                array.each{array_value->
+                    if (add){
+                        new_text = new_text + array_value
+                    }
+                    add = ! add
+                    echo array_value
+                }
+                echo new_text
+
+                newFile = 'temp.bsl'
+                writeFile(file: newFile, text: new_text)
+                result.put(newValue, sha256(newFile))
+            
             } else {
                 echoColourText(String.format('file %1$s in %2$s not found', newValue, repo), 31)
                 currentBuild.result = 'UNSTABLE'
@@ -104,19 +122,16 @@ def add_repo(map, repo){
     }
 }
 
-node('w-test'){
+node(){
     debug = false
 
-    function.sendMsg(true)
     currentBuild.result = "SUCCESS"
 
     try{
         
-        deleteDir() 
         files_for_check = [:]
         
         add_repo(files_for_check, 'rtl-trade')
-        add_repo(files_for_check, 'rtl-mdlp')
         add_repo(files_for_check, 'rtl-retail')
 
         stage('check'){
@@ -126,6 +141,6 @@ node('w-test'){
     } catch (exception) {
         function.setResultAfterError(exception)
     } finally {
-        function.sendMsg(false)
+        
     }
 }
