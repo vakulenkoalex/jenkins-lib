@@ -2,7 +2,9 @@
 <scriptApproval plugin="script-security@1275.v23895f409fb_d">
   <approvedScriptHashes/>
   <approvedSignatures>
+    <string>method groovy.lang.GroovyObject setProperty java.lang.String java.lang.Object</string>
     <string>new java.util.ArrayList</string>
+    <string>staticMethod java.lang.System lineSeparator</string>
     <string>staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods invokeMethod java.lang.Object java.lang.String java.lang.Object</string>
   </approvedSignatures>
   <aclApprovedSignatures/>
