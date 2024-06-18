@@ -1337,8 +1337,8 @@ class BehaveTest extends TestCase{
     void getResources(){
 
         if (!MainBuild.resourceExist(getClassName())) {
-            s_script.copyArtifacts(fingerprintArtifacts: true, projectName: s_script.env.repoAdd)
-            MainBuild.stashResource(getClassName(), 'bddRunner.epf, lib/featurereader/vbFeatureReader.epf, features/libraries/**, locales/**, plugins/**, vendor/**')
+            s_script.copyArtifacts(fingerprintArtifacts: true, projectName: s_script.env.repoVanessa)
+            MainBuild.stashResource(getClassName(), 'VanessaAutomation.epf, lib/**, features/Libraries/**, locales/**, plugins/**, vendor/**')
         }
 
         ArrayList stashStringFeature = new ArrayList()
@@ -1381,7 +1381,7 @@ class BehaveTest extends TestCase{
         final String configVanessa = """{
                                             "КаталогФич": "${workPathForJson}\\\\build\\\\spec\\\\features",
                                             "ДелатьОтчетВФорматеCucumberJson": "Истина",
-                                            "КаталогOutputCucumberJson": "${workPathForJson}\\\\${resultFolder}",
+                                            "КаталогВыгрузкиCucumberJson": "${workPathForJson}\\\\${resultFolder}",
                                             "ЗавершитьРаботуСистемы": "Истина",
                                             "ВыполнитьСценарии": "Истина",
                                             "СписокТеговИсключение": ["IgnoreOnCIMainBuild"]
@@ -1391,7 +1391,7 @@ class BehaveTest extends TestCase{
 
         ArrayList partOfText = new ArrayList()
         partOfText.add('start --test_manager')
-        partOfText.add('--epf bddRunner.epf')
+        partOfText.add('--epf VanessaAutomation.epf')
         partOfText.add(String.format('--options "StartFeaturePlayer;VBParams=%1$s\\%2$s"', workPath, fileNameConfig))
 
         if (m_type==BehaveTestType.WEB){
