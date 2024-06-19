@@ -1337,8 +1337,8 @@ class BehaveTest extends TestCase{
     void getResources(){
 
         if (!MainBuild.resourceExist(getClassName())) {
-            s_script.copyArtifacts(fingerprintArtifacts: true, projectName: s_script.env.repoVanessa)
-            MainBuild.stashResource(getClassName(), 'VanessaAutomation.epf, lib/**, features/Libraries/**, locales/**, plugins/**, vendor/**')
+            s_script.copyArtifacts(fingerprintArtifacts: true, projectName: s_script.env.repoVanessa, target: 'bdd')
+            MainBuild.stashResource(getClassName(), 'bdd/**')
         }
 
         ArrayList stashStringFeature = new ArrayList()
@@ -1391,7 +1391,7 @@ class BehaveTest extends TestCase{
 
         ArrayList partOfText = new ArrayList()
         partOfText.add('start --test_manager')
-        partOfText.add('--epf VanessaAutomation.epf')
+        partOfText.add('--epf bdd\\VanessaAutomation.epf')
         partOfText.add(String.format('--options "StartFeaturePlayer;VBParams=%1$s\\%2$s"', workPath, fileNameConfig))
 
         if (m_type==BehaveTestType.WEB){
