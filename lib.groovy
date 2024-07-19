@@ -639,7 +639,15 @@ final class MainBuild{
             }else if (object.name == 'SonarQube') {
                 s_tests.add(new SonarQube(object.name, object.node))
             }else if (object.name == 'YAxunit') {
-                s_tests.add(new YAxunit(object.name, object.node))
+
+                def files = s_script.findFiles(glob: 'spec/yaxunit/**/Configuration.xml')
+                for(int count = 0; count < files.size(); count++) {
+                    def file = files[count] 
+                    def extension = file.path.replace('spec\\yaxunit\\', '')
+                    extension = extension.replace('\\Configuration.xml', '')
+                    s_tests.add(new YAxunit(object.name + extension, object.node, extension))
+                }
+                
             }
         }
         
@@ -1479,11 +1487,11 @@ class SonarQube extends TestCase{
 
 class YAxunit extends TestCase{
 
-    private final String m_stashNameForTest
+    private final String m_extension
 
-    YAxunit(final String name, final String node){
+    YAxunit(final String name, final String node, final String extension){
         super(name, node)
-        m_stashNameForTest = name + 'Ext'
+        m_extension = extension
     }
 
     void getResources(){
@@ -1493,7 +1501,7 @@ class YAxunit extends TestCase{
             MainBuild.stashResource(getClassName(), 'jenkins\\**')
         }
 
-        MainBuild.stashResource(m_stashNameForTest, 'spec\\yaxunit\\**')
+        MainBuild.stashResource(m_extension, String.format('spec\\yaxunit\\%1$s\\**', m_extension))
 
     }
 
@@ -1501,7 +1509,7 @@ class YAxunit extends TestCase{
 
         MainBuild.unstashResource(MainBuild.baseFolder())
         MainBuild.unstashResource(getClassName())
-        MainBuild.unstashResource(m_stashNameForTest)
+        MainBuild.unstashResource(m_extension)
 
         final String workPath = s_script.pwd()
         final String resultName = getName().toLowerCase() + ".xml"
